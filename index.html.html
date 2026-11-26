@@ -3,1359 +3,2909 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Extractor Siclope — Exámenes de Laboratorio</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Inter & JetBrains Mono -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
-          },
-          colors: {
-            medical: {
-              50: '#f0f7ff',
-              100: '#e0effe',
-              200: '#bae0fd',
-              500: '#0ea5e9',
-              600: '#0284c7',
-              700: '#0369a1',
-              800: '#075985',
-              900: '#0c4a6e',
-            }
-          }
-        }
+  <title>Extractor Siclope v2 — Exámenes de Laboratorio</title>
+  <style>
+    /* =========================================================================
+       VARIABLES DE DISEÑO Y RESET (100% OFFLINE, SIN CDNs EXTERNOS)
+       ========================================================================= */
+    :root {
+      --bg-page: #f3f6fa;
+      --bg-card: #ffffff;
+      --bg-subtle: #f8fafc;
+      --bg-hover: #f1f5f9;
+      --bg-selected: #f0f9ff;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --text-main: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --primary-soft: #e0f2fe;
+      --primary-border: #bae6fd;
+      --success: #059669;
+      --success-hover: #047857;
+      --success-soft: #ecfdf5;
+      --success-border: #a7f3d0;
+      --danger: #e11d48;
+      --danger-soft: #fff1f2;
+      --danger-border: #fecdd3;
+      --low: #2563eb;
+      --low-soft: #eff6ff;
+      --low-border: #bfdbfe;
+      --warn: #d97706;
+      --warn-soft: #fffbeb;
+      --warn-border: #fde68a;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06);
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+    }
+
+    /* =========================================================================
+       ENCABEZADO SUPERIOR
+       ========================================================================= */
+    .app-header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 12px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0284c7, #1d4ed8);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.28);
+    }
+
+    .brand-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1.125rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      color: var(--text-main);
+    }
+
+    .badge-version {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: var(--primary-hover);
+      border: 1px solid var(--primary-border);
+    }
+
+    .brand-sub {
+      margin: 2px 0 0;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .offline-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--success);
+      background: var(--success-soft);
+      border: 1px solid var(--success-border);
+      padding: 6px 12px;
+      border-radius: 999px;
+    }
+
+    /* =========================================================================
+       LAYOUT PRINCIPAL (2 COLUMNAS EN ESCRITORIO, RESPONSIVO EN MÓVIL)
+       ========================================================================= */
+    .app-main {
+      flex: 1;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 18px 20px 28px;
+    }
+
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    @media (min-width: 1024px) {
+      .layout-grid {
+        grid-template-columns: minmax(340px, 430px) minmax(0, 1fr);
       }
-    };
-  </script>
+    }
+
+    .col-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    /* =========================================================================
+       TARJETAS (CARDS)
+       ========================================================================= */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 12px 16px;
+      background: var(--bg-subtle);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .card-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-badge {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-badge.green {
+      background: var(--success);
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .card-body {
+      padding: 14px 16px;
+    }
+
+    /* =========================================================================
+       BOTONES Y CONTROLES
+       ========================================================================= */
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      font-weight: 600;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.08s ease;
+      white-space: nowrap;
+      min-height: 34px;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: var(--bg-hover);
+      color: var(--text-main);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--primary-hover);
+      border-color: var(--primary-hover);
+      color: #ffffff;
+    }
+
+    .btn-soft {
+      background: var(--primary-soft);
+      border-color: var(--primary-border);
+      color: var(--primary-hover);
+    }
+
+    .btn-soft:hover:not(:disabled) {
+      background: #ccebfc;
+      color: var(--primary-hover);
+    }
+
+    .btn-danger-soft {
+      background: var(--danger-soft);
+      border-color: var(--danger-border);
+      color: var(--danger);
+    }
+
+    .btn-danger-soft:hover:not(:disabled) {
+      background: #ffe4e6;
+      color: #be123c;
+    }
+
+    .btn-warn-soft {
+      background: var(--warn-soft);
+      border-color: var(--warn-border);
+      color: var(--warn);
+    }
+
+    .btn-copy {
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      border-radius: 10px;
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+    }
+
+    .btn-copy:hover:not(:disabled) {
+      background: var(--primary-hover);
+      border-color: var(--primary-hover);
+      color: #ffffff;
+    }
+
+    .btn-copy.copied {
+      background: var(--success);
+      border-color: var(--success);
+      box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25);
+    }
+
+    .btn.preset-active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+    }
+
+    /* =========================================================================
+       INPUTS Y TEXTAREAS
+       ========================================================================= */
+    .textarea-raw {
+      width: 100%;
+      min-height: 290px;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-strong);
+      background: var(--bg-subtle);
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      line-height: 1.5;
+      resize: vertical;
+      transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+    }
+
+    .textarea-raw:focus,
+    .textarea-output:focus,
+    .text-input:focus,
+    .select-input:focus {
+      outline: none;
+      background: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.16);
+    }
+
+    .textarea-output {
+      width: 100%;
+      min-height: 132px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-strong);
+      background: #fcfdff;
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-size: 0.86rem;
+      line-height: 1.55;
+      resize: vertical;
+    }
+
+    .text-input,
+    .select-input {
+      padding: 7px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong);
+      background: #ffffff;
+      color: var(--text-main);
+      font-size: 0.8rem;
+      min-height: 34px;
+    }
+
+    .status-bar {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border-strong);
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    .status-dot.ok { background: var(--success); }
+    .status-dot.warn { background: var(--warn); }
+
+    .manual-date-box {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .manual-date-label {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .manual-date-hint {
+      font-size: 0.72rem;
+      color: var(--text-light);
+      display: block;
+      font-weight: 400;
+    }
+
+    /* =========================================================================
+       BARRA DE TOGGLES COMPACTOS (RESULTADO)
+       ========================================================================= */
+    .options-bar {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toggle-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+
+    .toggle-chip:hover {
+      border-color: var(--primary);
+    }
+
+    .toggle-chip input {
+      margin: 0;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .toggle-chip.active {
+      background: var(--primary-soft);
+      border-color: var(--primary-border);
+      color: var(--primary-hover);
+    }
+
+    .style-select-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 640px) {
+      .style-select-wrap {
+        margin-left: 0;
+        width: 100%;
+      }
+      .style-select-wrap select {
+        flex: 1;
+      }
+    }
+
+    .output-meta-row {
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.72rem;
+      color: var(--text-light);
+    }
+
+    .manual-edit-tag {
+      color: var(--warn);
+      font-weight: 600;
+    }
+
+    /* =========================================================================
+       SELECTOR INTERACTIVO DE EXÁMENES
+       ========================================================================= */
+    .search-wrap {
+      position: relative;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 34px 8px 34px;
+      border-radius: 10px;
+      border: 1px solid var(--border-strong);
+      background: #ffffff;
+      font-size: 0.82rem;
+      color: var(--text-main);
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: transparent;
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 4px;
+      display: none;
+    }
+
+    .search-clear:hover {
+      color: var(--text-main);
+    }
+
+    .exams-scroll {
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .date-group-header {
+      padding: 8px 16px;
+      background: #e9f2fb;
+      border-top: 1px solid var(--primary-border);
+      border-bottom: 1px solid var(--primary-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #0c4a6e;
+    }
+
+    .date-group:first-child .date-group-header {
+      border-top: none;
+    }
+
+    .section-header {
+      padding: 8px 16px;
+      background: var(--bg-subtle);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+
+    .section-check-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+    }
+
+    .section-check-label input,
+    .exam-row input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .count-pill {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    .exam-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.12s ease;
+    }
+
+    .exam-row:hover {
+      background: var(--bg-hover);
+    }
+
+    .exam-row.selected {
+      background: var(--bg-selected);
+    }
+
+    .exam-row.selected:hover {
+      background: #e0f2fe70;
+    }
+
+    .exam-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .exam-names {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .exam-label-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .exam-short {
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .exam-time-pill {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 6px;
+      background: #f1f5f9;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .exam-abr-pill {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: #f8fafc;
+      color: var(--text-light);
+      border: 1px solid var(--border);
+    }
+
+    .exam-full {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+
+    .exam-right {
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .exam-val-line {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .val-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 8px;
+      border-radius: 7px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      background: #f1f5f9;
+      color: var(--text-main);
+      border: 1px solid var(--border);
+    }
+
+    .val-badge.high {
+      background: var(--danger-soft);
+      color: var(--danger);
+      border-color: var(--danger-border);
+    }
+
+    .val-badge.low {
+      background: var(--low-soft);
+      color: var(--low);
+      border-color: var(--low-border);
+    }
+
+    .exam-unit {
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .exam-ref {
+      font-family: var(--font-mono);
+      font-size: 0.69rem;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+
+    .empty-state {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .empty-icon {
+      width: 46px;
+      height: 46px;
+      margin: 0 auto 10px;
+      border-radius: 14px;
+      background: var(--bg-hover);
+      color: var(--text-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .empty-state p {
+      margin: 4px 0 0;
+      font-size: 0.8rem;
+    }
+
+    .empty-state .empty-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* =========================================================================
+       TOAST FLOTANTE Y PIE DE PÁGINA
+       ========================================================================= */
+    .toast-container {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #ffffff;
+      background: #1e293b;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast.success { background: var(--success); }
+    .toast.warn { background: var(--warn); }
+
+    .app-footer {
+      border-top: 1px solid var(--border);
+      background: var(--bg-card);
+      padding: 14px 20px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .footer-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+<body>
+  <!-- Contenedor de notificaciones toast -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
-  <!-- Toast de notificaciones (reemplaza alert/confirm) -->
-  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
-
-  <!-- Encabezado principal -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <!-- Logo SVG clínico -->
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-medical-600 to-blue-700 flex items-center justify-center text-white shadow-sm shrink-0">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+  <!-- Encabezado -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="8" y1="13" x2="16" y2="13"></line>
+            <line x1="8" y1="17" x2="13" y2="17"></line>
           </svg>
         </div>
         <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">Extractor Siclope</h1>
-            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-medical-50 text-medical-700 border border-medical-200">
-              Siclope / Openlab
-            </span>
+          <div class="brand-title-row">
+            <h1>Extractor Siclope v2</h1>
+            <span class="badge-version">Siclope / Openlab</span>
           </div>
-          <p class="text-xs text-slate-500">Extracción rápida para evoluciones médicas · Precisión numérica exacta</p>
+          <p class="brand-sub">Extracción exacta para evoluciones clínicas · Multi-día, Gases y controles seriados</p>
         </div>
       </div>
 
-      <!-- Indicador de privacidad local -->
-      <div class="flex items-center gap-2 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+      <div class="offline-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
         </svg>
-        <span>100% local en tu navegador</span>
+        <span>100% Offline · Sin servidor</span>
       </div>
     </div>
   </header>
 
-  <!-- Contenido principal: 2 columnas en escritorio -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+  <!-- Contenido principal -->
+  <main class="app-main">
+    <div class="layout-grid">
 
-      <!-- COLUMNA IZQUIERDA: Entrada de texto + Configuración -->
-      <section class="lg:col-span-5 flex flex-col gap-5">
-
-        <!-- Tarjeta 1: Pegar texto desde Siclope -->
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div class="px-4 py-3.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-slate-50/60">
-            <div class="flex items-center gap-2">
-              <span class="w-6 h-6 rounded-full bg-medical-600 text-white text-xs font-bold flex items-center justify-center">1</span>
-              <h2 class="text-sm font-semibold text-slate-800">Pegar tabla de Siclope / Openlab</h2>
+      <!-- ===================================================================
+           PANEL IZQUIERDO: ENTRADA DE TEXTO DESDE SICLOPE
+           =================================================================== -->
+      <section class="col-stack">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <span class="step-badge">1</span>
+              <h2 class="card-title">Pegar exámenes de Siclope</h2>
             </div>
-            <div class="flex items-center gap-1.5">
-              <button id="btnLoadExample" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-medical-50 text-medical-700 hover:bg-medical-100 border border-medical-200 transition-colors cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-                Cargar ejemplo
-              </button>
-              <button id="btnClear" type="button" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                Limpiar
-              </button>
+            <div class="btn-group">
+              <button id="btnExampleMain" type="button" class="btn btn-soft">Cargar ejemplo</button>
+              <button id="btnExampleMulti" type="button" class="btn">Ejemplo varios días</button>
+              <button id="btnClear" type="button" class="btn">Limpiar</button>
             </div>
           </div>
 
-          <div class="p-4">
+          <div class="card-body">
             <textarea
               id="rawInput"
-              rows="11"
+              class="textarea-raw"
               spellcheck="false"
-              placeholder="Pega aquí los exámenes copiados directamente desde Siclope / Openlab (puedes incluir el encabezado con la fecha y todas las secciones: Hematología, Bioquímica, Coagulación, Orina, Gases, etc.)..."
-              class="w-full rounded-xl border border-slate-300 bg-slate-50/50 focus:bg-white p-3 text-xs font-mono text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-medical-500/30 focus:border-medical-500 transition-all resize-y"
+              placeholder="Pega aquí directamente los exámenes copiados desde Siclope / Openlab...&#10;&#10;Soporta ambos formatos:&#10;• Con fecha y hora en cada fila (sin Abr)&#10;• Clásico Openlab con columna Abr&#10;• Varias fechas, Gases y controles seriados"
             ></textarea>
 
-            <!-- Barra de estado del parser -->
-            <div class="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
-              <div id="parseStatus" class="text-slate-500 flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-slate-300 inline-block"></span>
+            <div class="status-bar">
+              <div id="parseStatus">
+                <span class="status-dot"></span>
                 <span>Esperando exámenes...</span>
               </div>
-              <div id="dateBadge" class="hidden items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <span id="dateBadgeText"></span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tarjeta 2: Opciones de formato de salida -->
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div class="px-4 py-3.5 border-b border-slate-100 flex items-center gap-2 bg-slate-50/60">
-            <span class="w-6 h-6 rounded-full bg-medical-600 text-white text-xs font-bold flex items-center justify-center">2</span>
-            <h2 class="text-sm font-semibold text-slate-800">Formato de salida</h2>
-          </div>
-
-          <div class="p-4 space-y-4">
-            <!-- Tipo de etiqueta -->
-            <div>
-              <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Etiqueta del examen</label>
-              <div class="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-xl" id="labelModeGroup">
-                <button type="button" data-label-mode="short" class="label-mode-btn px-2.5 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer bg-white text-medical-700 shadow-sm">
-                  Corta clínica<span class="block text-[10px] font-normal text-slate-400">Hb 8,5</span>
-                </button>
-                <button type="button" data-label-mode="abr" class="label-mode-btn px-2.5 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer text-slate-600 hover:text-slate-900">
-                  Abr. Siclope<span class="block text-[10px] font-normal text-slate-400">HGB 8,5</span>
-                </button>
-                <button type="button" data-label-mode="full" class="label-mode-btn px-2.5 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer text-slate-600 hover:text-slate-900">
-                  Completo<span class="block text-[10px] font-normal text-slate-400">Hemoglobina 8,5</span>
-                </button>
-              </div>
+              <div id="formatBadge" class="count-pill hidden"></div>
             </div>
 
-            <!-- Separador y Decimales -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div>
-                <label for="separatorSelect" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Separador</label>
-                <select id="separatorSelect" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-medical-500/30 focus:border-medical-500">
-                  <option value=" / " selected>Barra ( / )</option>
-                  <option value=" - ">Guión ( - )</option>
-                  <option value=" | ">Tubería ( | )</option>
-                  <option value=", ">Coma ( , )</option>
-                  <option value="\n">Salto de línea</option>
-                </select>
-              </div>
-
-              <div>
-                <label for="decimalSelect" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">Decimales (sin redondear)</label>
-                <select id="decimalSelect" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-medical-500/30 focus:border-medical-500">
-                  <option value="keep" selected>Tal cual (coma ,)</option>
-                  <option value="dot">Cambiar coma a punto (.)</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Opciones con checkboxes -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-              <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors">
-                <input id="optGroupBySection" type="checkbox" checked class="w-4 h-4 rounded text-medical-600 focus:ring-medical-500 border-slate-300" />
-                <span class="text-xs font-medium text-slate-700">Agrupar por sección</span>
+            <!-- Fecha manual opcional (solo usada si los exámenes no traen fecha) -->
+            <div class="manual-date-box">
+              <label for="manualDateInput" class="manual-date-label">
+                Fecha manual (opcional)
+                <span class="manual-date-hint">Solo se usa si el texto pegado no trae fecha</span>
               </label>
-
-              <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors">
-                <input id="optIncludeFlags" type="checkbox" class="w-4 h-4 rounded text-medical-600 focus:ring-medical-500 border-slate-300" />
-                <span class="text-xs font-medium text-slate-700">Incluir flechas (↑ / ↓)</span>
-              </label>
-
-              <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors">
-                <input id="optIncludeUnits" type="checkbox" class="w-4 h-4 rounded text-medical-600 focus:ring-medical-500 border-slate-300" />
-                <span class="text-xs font-medium text-slate-700">Incluir unidades</span>
-              </label>
-
-              <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors">
-                <input id="optIncludeDate" type="checkbox" checked class="w-4 h-4 rounded text-medical-600 focus:ring-medical-500 border-slate-300" />
-                <span class="text-xs font-medium text-slate-700">Incluir fecha detectada</span>
-              </label>
+              <input
+                id="manualDateInput"
+                type="text"
+                class="text-input"
+                style="width: 115px; font-family: var(--font-mono);"
+                placeholder="ej. 21/11"
+              />
             </div>
           </div>
         </div>
       </section>
 
-      <!-- COLUMNA DERECHA: Resultado listo para copiar + Selector interactivo -->
-      <section class="lg:col-span-7 flex flex-col gap-5">
+      <!-- ===================================================================
+           PANEL DERECHO: RESULTADO LISTO + SELECTOR INTERACTIVO
+           =================================================================== -->
+      <section class="col-stack">
 
-        <!-- Tarjeta 3: Resultado generado y botón de copiar -->
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div class="px-4 py-3.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-slate-50/60">
-            <div class="flex items-center gap-2">
-              <span class="w-6 h-6 rounded-full bg-emerald-600 text-white text-xs font-bold flex items-center justify-center">3</span>
-              <h2 class="text-sm font-semibold text-slate-800">Resultado para copiar</h2>
-              <span id="selectedCountBadge" class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-200 text-slate-700">
-                0 seleccionados
-              </span>
+        <!-- BLOQUE SUPERIOR: RESULTADO PARA COPIAR -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-wrap">
+              <span class="step-badge green">2</span>
+              <h2 class="card-title">Resultado para evolución</h2>
+              <span id="selectedBadge" class="count-pill">0 seleccionados</span>
             </div>
 
-            <div class="flex items-center gap-2">
-              <button id="btnResetOutput" type="button" class="hidden text-xs font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-2.5 py-1 rounded-lg transition-colors cursor-pointer">
-                Restaurar generado
-              </button>
-              <button id="btnCopy" type="button" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-medical-600 hover:bg-medical-700 active:bg-medical-800 text-white shadow-sm transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-                <svg id="iconCopy" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            <div class="btn-group">
+              <button id="btnResetManual" type="button" class="btn btn-warn-soft hidden">Restaurar</button>
+              <button id="btnCopy" type="button" class="btn btn-copy" disabled>
+                <svg id="iconCopy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                 </svg>
-                <svg id="iconCheck" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                <svg id="iconCheck" class="hidden" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
                 <span id="btnCopyText">Copiar resultado</span>
               </button>
             </div>
           </div>
 
-          <div class="p-4">
+          <div class="card-body">
             <textarea
               id="outputText"
-              rows="5"
-              placeholder="Aquí aparecerá el resumen formateado en tiempo real según los exámenes que selecciones..."
-              class="w-full rounded-xl border border-slate-300 bg-slate-50/40 focus:bg-white p-3.5 text-sm font-mono text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-medical-500/30 focus:border-medical-500 transition-all resize-y"
+              class="textarea-output"
+              placeholder="Aquí aparecerá el resumen formateado listo para copiar y pegar en tu evolución..."
             ></textarea>
-            <p class="mt-1.5 text-[11px] text-slate-400 flex items-center justify-between">
-              <span>Puedes editar este cuadro manualmente antes de copiar.</span>
-              <span id="manualEditNotice" class="hidden text-amber-600 font-medium">Editado manualmente</span>
-            </p>
+
+            <div class="output-meta-row">
+              <span>Puedes editar este texto manualmente antes de copiar. Valores siempre exactos, sin redondeo.</span>
+              <span id="manualEditTag" class="manual-edit-tag hidden">Editado manualmente</span>
+            </div>
+
+            <!-- Barra compacta de toggles rápidos -->
+            <div class="options-bar">
+              <label class="toggle-chip active" data-chip="optGroupElp">
+                <input id="optGroupElp" type="checkbox" checked />
+                <span>Agrupar Na/K/Cl</span>
+              </label>
+
+              <label class="toggle-chip active" data-chip="optSeparateGases">
+                <input id="optSeparateGases" type="checkbox" checked />
+                <span>Separar Gases</span>
+              </label>
+
+              <label class="toggle-chip active" data-chip="optDotDecimal">
+                <input id="optDotDecimal" type="checkbox" checked />
+                <span>Punto decimal (.)</span>
+              </label>
+
+              <label class="toggle-chip" data-chip="optStripZeros">
+                <input id="optStripZeros" type="checkbox" />
+                <span>Quitar .0 finales</span>
+              </label>
+
+              <label class="toggle-chip" data-chip="optFlags">
+                <input id="optFlags" type="checkbox" />
+                <span>Flechas ↑/↓</span>
+              </label>
+
+              <label class="toggle-chip" data-chip="optUnits">
+                <input id="optUnits" type="checkbox" />
+                <span>Unidades</span>
+              </label>
+
+              <label class="toggle-chip" data-chip="optGasTypeTitle">
+                <input id="optGasTypeTitle" type="checkbox" />
+                <span>Tipo de gas en título</span>
+              </label>
+
+              <div class="style-select-wrap">
+                <label for="labelStyleSelect">Nombres:</label>
+                <select id="labelStyleSelect" class="select-input">
+                  <option value="preferred" selected>Preferido (clínico)</option>
+                  <option value="short">Ultra-corto (FA, BUN, Ca)</option>
+                  <option value="full">Nombre completo</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Tarjeta 4: Selector interactivo de exámenes -->
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-          <div class="px-4 py-3.5 border-b border-slate-100 bg-slate-50/60 space-y-3">
-            <div class="flex flex-wrap items-center justify-between gap-2">
-              <h2 class="text-sm font-semibold text-slate-800">Seleccionar exámenes</h2>
+        <!-- BLOQUE INFERIOR: SELECTOR INTERACTIVO DE EXÁMENES -->
+        <div class="card">
+          <div class="card-header" style="flex-direction: column; align-items: stretch;">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;">
+              <div class="card-title-wrap">
+                <span class="step-badge">3</span>
+                <h2 class="card-title">Seleccionar exámenes</h2>
+              </div>
 
-              <!-- Botones de selección rápida -->
-              <div class="flex flex-wrap items-center gap-1.5">
-                <button id="btnSelectEssential" type="button" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-medical-600 text-white hover:bg-medical-700 transition-colors cursor-pointer shadow-xs">
-                  Esenciales clínicos
-                </button>
-                <button id="btnSelectAltered" type="button" class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 transition-colors cursor-pointer">
-                  Solo alterados (↑/↓)
-                </button>
-                <button id="btnSelectAll" type="button" class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer">
-                  Todos
-                </button>
-                <button id="btnSelectNone" type="button" class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer">
-                  Ninguno
-                </button>
+              <div class="btn-group">
+                <button id="btnPresetEssential" type="button" class="btn preset-active">Esenciales clínicos</button>
+                <button id="btnPresetAll" type="button" class="btn">Seleccionar todos</button>
+                <button id="btnPresetAltered" type="button" class="btn btn-danger-soft">Solo alterados (↑/↓)</button>
+                <button id="btnPresetNone" type="button" class="btn">Ninguno</button>
               </div>
             </div>
 
-            <!-- Buscador rápido -->
-            <div class="relative">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <div class="search-wrap">
+              <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
               <input
                 id="searchInput"
                 type="text"
-                placeholder="Buscar examen por nombre o abreviatura (ej. Hb, Creatinina, PCR, NA)..."
-                class="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-medical-500/30 focus:border-medical-500"
+                class="search-input"
+                placeholder="Buscar examen (ej. Hb, Crea, Na, PCR, TTPA, pH, Gases)..."
               />
-              <button id="btnClearSearch" type="button" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1" aria-label="Limpiar búsqueda">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+              <button id="btnClearSearch" type="button" class="search-clear" aria-label="Limpiar búsqueda">✕</button>
             </div>
           </div>
 
-          <!-- Lista de exámenes por sección -->
-          <div id="examsContainer" class="divide-y divide-slate-100 max-h-[620px] overflow-y-auto">
-            <!-- Estado vacío inicial -->
-            <div class="p-10 text-center">
-              <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+          <div id="examsContainer" class="exams-scroll">
+            <div class="empty-state">
+              <div class="empty-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
                 </svg>
               </div>
-              <p class="text-sm font-medium text-slate-700">Aún no hay exámenes cargados</p>
-              <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-                Pega el texto copiado desde Siclope en el panel izquierdo o presiona <strong>"Cargar ejemplo"</strong> para probar el extractor.
-              </p>
+              <p class="empty-title">Aún no hay exámenes pegados</p>
+              <p>Pega los resultados de Siclope en el panel izquierdo o prueba con <strong>"Cargar ejemplo"</strong>.</p>
             </div>
           </div>
         </div>
+
       </section>
     </div>
   </main>
 
   <!-- Pie de página -->
-  <footer class="border-t border-slate-200 bg-white mt-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
-      <p><strong>Extractor Siclope</strong> · Herramienta clínica local para formato Siclope / Openlab.</p>
-      <p>Los valores se conservan exactamente como texto original, sin redondeos ni aproximaciones.</p>
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <span><strong>Extractor Siclope v2</strong> · Funciona 100% en tu navegador sin enviar datos a internet.</span>
+      <span>Precisión estricta como texto: jamás redondea ni aproxima valores numéricos.</span>
     </div>
   </footer>
 
   <script>
-    /**
-     * =========================================================================
-     * EXTRACTOR SICLOPE — Lógica principal y Motor de Parsing
-     * =========================================================================
-     * Regla de oro: NUNCA convertir los valores a float ni redondearlos.
-     * Todos los valores se extraen, almacenan y formatean estrictamente como string.
-     */
+    (function () {
+      'use strict';
 
-    // 1. Diccionario inteligente de nombres clínicos cortos para abreviaturas de Siclope
-    const CLINICAL_SHORT_MAP = {
-      // Hematología
-      'RLEUC': 'GB',
-      'LEU': 'GB',
-      'WBC': 'GB',
-      'RBC': 'GR',
-      'HGB': 'Hb',
-      'HCT': 'Hto',
-      'VCM': 'VCM',
-      'HCM': 'HCM',
-      'CHCM': 'CHCM',
-      'RDW': 'RDW',
-      'PLT': 'Plaq',
-      'SEG%': 'Seg%',
-      'NEU%': 'Neu%',
-      'LYM%': 'Linf%',
-      'MON%': 'Mon%',
-      'EOS%': 'Eos%',
-      'BAS%': 'Bac%',
-      'BASO%': 'Baso%',
-      'BLA%': 'Blastos%',
-      'PROM%': 'Prom%',
-      'MIEL%': 'Miel%',
-      'JUVE%': 'Juv%',
-      'PLAS%': 'Plas%',
-      'SEGME': 'RAN',
-      'LYM': 'RAL',
-      'MONO': 'Mon',
-      'EO': 'Eos',
-      'BASOF': 'Baso',
-      'BACILI': 'Bac',
-      'VHS': 'VHS',
-      'RETIC': 'Retic',
+      /* =========================================================================
+         1. UTILIDADES DE NORMALIZACIÓN DE TEXTO
+         ========================================================================= */
 
-      // Bioquímica / Perfil hepático / Renal / ELP
-      'TGO': 'GOT',
-      'GOT': 'GOT',
-      'AST': 'GOT',
-      'TGP': 'GPT',
-      'GPT': 'GPT',
-      'ALT': 'GPT',
-      'FAL': 'FA',
-      'FA': 'FA',
-      'GGT': 'GGT',
-      'BILT': 'BT',
-      'BILD': 'BD',
-      'BILI': 'BI',
-      'URI': 'Ác. Úrico',
-      'COL': 'ColT',
-      'COLT': 'ColT',
-      'HDL': 'HDL',
-      'LDL': 'LDL',
-      'TRIG': 'TG',
-      'CREAP': 'Crea',
-      'CREA': 'Crea',
-      'CA': 'Ca',
-      'FOS': 'P',
-      'MG': 'Mg',
-      'PROT': 'ProtT',
-      'ALB': 'Alb',
-      'GLU': 'Glu',
-      'GLIC': 'Glu',
-      'NA': 'Na',
-      'K': 'K',
-      'CL': 'Cl',
-      'NU': 'BUN',
-      'BUN': 'BUN',
-      'UREA': 'Urea',
-      'PCR': 'PCR',
-      'LDH': 'LDH',
-      'CK': 'CK',
-      'CKMB': 'CK-MB',
-      'AMIL': 'Amilasa',
-      'LIP': 'Lipasa',
-      'LAC': 'Lactato',
-      'PROCAL': 'PCT',
-      'TROPO': 'Tropo',
-      'TSH': 'TSH',
-      'T4L': 'T4L',
-      'HBA1C': 'HbA1c',
+      /**
+       * Normaliza texto para comparación de nombres de exámenes:
+       * minúsculas, sin tildes, sin signos redundantes y espacios colapsados.
+       */
+      function normalizeText(str) {
+        return String(str || '')
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
 
-      // Coagulación
-      'TP%': 'TP%',
-      'TP': 'TP',
-      'INR': 'INR',
-      'TTPA': 'TTPA',
-      'FIBRI': 'Fibrinógeno',
-      'DDIM': 'Dímero D'
-    };
+      /**
+       * Escapa HTML seguro para mensajes dinámicos.
+       */
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
 
-    // 2. Lista de abreviaturas consideradas "Esenciales clínicos"
-    const ESSENTIAL_CODES = new Set([
-      'RLEUC', 'HGB', 'HCT', 'VCM', 'SEG%', 'LYM%', 'PLT',
-      'CREAP', 'CREA', 'NU', 'BUN', 'NA', 'K', 'CL', 'PCR',
-      'TGO', 'GOT', 'TGP', 'GPT', 'FAL', 'BILT', 'ALB', 'GLU', 'CA', 'FOS',
-      'TP%', 'INR', 'TTPA'
-    ]);
+      /* =========================================================================
+         2. CATÁLOGO CLÍNICO CANÓNICO DE EXÁMENES
+         =========================================================================
+         Mapea tanto por nombre completo (Formato B sin Abr) como por código Abr
+         (Formato A clásico Openlab). Define:
+         - preferred: abreviatura clínica preferida por el usuario
+         - short: versión ultra-corta
+         - essential: si entra en el preset "Esenciales clínicos"
+         - appendPercent: agrega "%" al final del valor (Porcentaje de protrombina)
+         - sortPriority: orden clínico explícito (ej. Coagulación: TP -> Protrombina% -> INR -> TTPA)
+         - elpRole: 'Na' | 'K' | 'Cl' para agrupación compacta Na/K/Cl
+         ========================================================================= */
+      const EXAM_CATALOG = [
+        // --- HEMATOLOGÍA ---
+        {
+          key: 'leuco', preferred: 'Leuco', short: 'GB', essential: true,
+          abrs: ['RLEUC', 'LEU', 'WBC'],
+          names: ['recuento leucocitos', 'recuento de leucocitos', 'leucocitos', 'globulos blancos']
+        },
+        {
+          key: 'rbc', preferred: 'GR', short: 'GR', essential: false,
+          abrs: ['RBC', 'RERIT'],
+          names: ['recuento de eritrocitos', 'recuento eritrocitos', 'eritrocitos', 'globulos rojos']
+        },
+        {
+          key: 'hb', preferred: 'Hb', short: 'Hb', essential: true,
+          abrs: ['HGB', 'HB'],
+          names: ['hemoglobina']
+        },
+        {
+          key: 'hcto', preferred: 'Hcto', short: 'Hto', essential: true,
+          abrs: ['HCT', 'HTO'],
+          names: ['hematocrito']
+        },
+        {
+          key: 'vcm', preferred: 'VCM', short: 'VCM', essential: false,
+          abrs: ['VCM', 'MCV'],
+          names: ['volumen corpuscular medio', 'vcm']
+        },
+        {
+          key: 'hcm', preferred: 'HCM', short: 'HCM', essential: false,
+          abrs: ['HCM', 'MCH'],
+          names: ['hemoglobina corpuscular media', 'hcm']
+        },
+        {
+          key: 'chcm', preferred: 'CHCM', short: 'CHCM', essential: false,
+          abrs: ['CHCM', 'MCHC'],
+          names: ['concentracion hemoglobina corpuscular media', 'concentracion de hemoglobina corpuscular media', 'chcm']
+        },
+        {
+          key: 'rdw', preferred: 'RDW', short: 'RDW', essential: false,
+          abrs: ['RDW', 'ADE'],
+          names: ['rdw', 'ancho de distribucion eritrocitaria', 'amplitud de distribucion eritrocitaria']
+        },
+        {
+          key: 'plaq', preferred: 'Plaq', short: 'Plaq', essential: true,
+          abrs: ['PLT', 'PLAQ'],
+          names: ['plaquetas', 'recuento de plaquetas', 'recuento plaquetas']
+        },
+        // Fórmula leucocitaria porcentual (no esenciales por defecto)
+        {
+          key: 'eos_pct', preferred: 'Eos%', short: 'Eos%', essential: false,
+          abrs: ['EOS%'], names: ['porcentaje de eosinofilos', 'eosinofilos %']
+        },
+        {
+          key: 'baso_pct', preferred: 'Baso%', short: 'Baso%', essential: false,
+          abrs: ['BASO%'], names: ['porcentaje de basofilos', 'basofilos %']
+        },
+        {
+          key: 'bla_pct', preferred: 'Blastos%', short: 'Blastos%', essential: false,
+          abrs: ['BLA%'], names: ['porcentaje de blastos', 'blastos %']
+        },
+        {
+          key: 'prom_pct', preferred: 'Prom%', short: 'Prom%', essential: false,
+          abrs: ['PROM%'], names: ['porcentaje de promielocitos', 'promielocitos %']
+        },
+        {
+          key: 'miel_pct', preferred: 'Miel%', short: 'Miel%', essential: false,
+          abrs: ['MIEL%'], names: ['porcentaje de mielocitos', 'mielocitos %']
+        },
+        {
+          key: 'juve_pct', preferred: 'Juv%', short: 'Juv%', essential: false,
+          abrs: ['JUVE%'], names: ['porcentaje de juveniles', 'juveniles %']
+        },
+        {
+          key: 'bac_pct', preferred: 'Bac%', short: 'Bac%', essential: false,
+          abrs: ['BAS%', 'BAC%'], names: ['porcentaje de baciliformes', 'baciliformes %']
+        },
+        {
+          key: 'seg_pct', preferred: 'Seg%', short: 'Seg%', essential: false,
+          abrs: ['SEG%', 'NEU%'], names: ['porcentaje de segmentados', 'porcentaje de neutrofilos', 'segmentados %', 'neutrofilos %']
+        },
+        {
+          key: 'lym_pct', preferred: 'Linf%', short: 'Linf%', essential: false,
+          abrs: ['LYM%', 'LINF%'], names: ['porcentaje de linfocitos', 'linfocitos %']
+        },
+        {
+          key: 'mon_pct', preferred: 'Mon%', short: 'Mon%', essential: false,
+          abrs: ['MON%'], names: ['porcentaje de monocitos', 'monocitos %']
+        },
+        {
+          key: 'plas_pct', preferred: 'Plas%', short: 'Plas%', essential: false,
+          abrs: ['PLAS%'], names: ['porcentaje de plasmocitos', 'plasmocitos %']
+        },
+        // Fórmula leucocitaria absoluta (incluye corrección a typos reales de Siclope: "absolutos", "aboluto")
+        {
+          key: 'eos_abs', preferred: 'Eos abs', short: 'Eos', essential: false,
+          abrs: ['EO', 'EOS'], names: ['numero absoluto de eosinofilos', 'numero absolutos de eosinofilos', 'eosinofilos absolutos']
+        },
+        {
+          key: 'baso_abs', preferred: 'Baso abs', short: 'Baso', essential: false,
+          abrs: ['BASOF'], names: ['numero absoluto de basofilos', 'numero absolutos de basofilos', 'basofilos absolutos']
+        },
+        {
+          key: 'bla_abs', preferred: 'Blastos abs', short: 'Blastos', essential: false,
+          abrs: ['BLASTO'], names: ['numero absoluto de blastos', 'numero absolutos de blastos', 'blastos absolutos']
+        },
+        {
+          key: 'prom_abs', preferred: 'Prom abs', short: 'Prom', essential: false,
+          abrs: ['PROMIE'], names: ['numero absoluto de promielocitos', 'numero absolutos de promielocitos']
+        },
+        {
+          key: 'miel_abs', preferred: 'Miel abs', short: 'Miel', essential: false,
+          abrs: ['MIELOC'], names: ['numero absoluto de mielocitos', 'numero absolutos de mielocitos']
+        },
+        {
+          key: 'juve_abs', preferred: 'Juv abs', short: 'Juv', essential: false,
+          abrs: ['JUVENI'], names: ['numero absoluto de juveniles', 'numero absolutos de juveniles']
+        },
+        {
+          key: 'bac_abs', preferred: 'Bac abs', short: 'Bac', essential: false,
+          abrs: ['BACILI'], names: ['numero absoluto de baciliformes', 'numero absolutos de baciliformes', 'numero aboluto de baciliformes']
+        },
+        {
+          key: 'seg_abs', preferred: 'RAN', short: 'RAN', essential: false,
+          abrs: ['SEGME', 'NEU', 'RAN'], names: ['numero absoluto de segmentados', 'numero absolutos de segmentados', 'numero absoluto de neutrofilos', 'recuento absoluto de neutrofilos']
+        },
+        {
+          key: 'lym_abs', preferred: 'RAL', short: 'RAL', essential: false,
+          abrs: ['LYM', 'LINF', 'RAL'], names: ['numero absoluto de linfocitos', 'numero absolutos de linfocitos', 'recuento absoluto de linfocitos']
+        },
+        {
+          key: 'mon_abs', preferred: 'Mon abs', short: 'Mon', essential: false,
+          abrs: ['MONO'], names: ['numero absoluto de monocitos', 'numero absolutos de monocitos']
+        },
+        {
+          key: 'plas_abs', preferred: 'Plas abs', short: 'Plas', essential: false,
+          abrs: ['PLASM'], names: ['numero absoluto de plasmocitos', 'numero absolutos de plasmocitos']
+        },
+        {
+          key: 'vhs', preferred: 'VHS', short: 'VHS', essential: true,
+          abrs: ['VHS', 'VSG'], names: ['vhs', 'velocidad de sedimentacion', 'velocidad de eritrosedimentacion']
+        },
+        {
+          key: 'retic', preferred: 'Retic', short: 'Retic', essential: false,
+          abrs: ['RETIC'], names: ['reticulocitos', 'porcentaje de reticulocitos']
+        },
 
-    // 3. Texto de ejemplo completo basado en Siclope / Openlab
-    const SAMPLE_SICLOPE_TEXT = `Petición 261128017 - Informe de resultados
-Fecha: 21-11-2026 0:00:00
-Servicio: MEDICINA
-Abr Nombre Valor Flag Unidad Intervalo de referencia Imagen asociada 
-Sección Hematología 
-HEMO HEMOGRAMA      
-RLEUC Recuento leucocitos 8,47  x10^3/ul
- ( 4,50 - 11,00 )  
-RBC Recuento de Eritrocitos 3,06 ↓ x10^6/ul
- ( 4,00 - 5,20 )  
-HGB Hemoglobina 8,5 ↓ g/dL ( 13,5 - 17,2 )  
-HCT Hematocrito 28,2 ↓ % ( 42,0 - 54,0 )  
-VCM Volumen Corpuscular Medio 92,2  fL ( 82,0 - 96,0 )  
-HCM Hemoglobina Corpuscular Media 27,8 ↓ Pg ( 28,0 - 32,0 )  
-CHCM Concentración Hemoglobina
-Corpuscular Media 30,1 ↓ g/dL ( 32,0 - 36,0 )  
-PLT Plaquetas 81 ↓ x10^3/ul
- ( 140 - 440 )  
-EOS% Porcentaje de Eosinófilos 0,8 ↓ % ( 1,0 - 5,0 )  
-BASO% Porcentaje de Basófilos 0,5  % ( 0,0 - 1,0 )  
-BLA% Porcentaje de Blastos 0,0  %   
-PROM% Porcentaje de Promielocitos 0,0  %   
-MIEL% Porcentaje de Mielocitos 0,0  %   
-JUVE% Porcentaje de Juveniles 0,0  %   
-BAS% Porcentaje de Baciliformes 0,0  %   
-SEG% Porcentaje de Segmentados 66,4  % ( 50,0 - 70,0 )  
-LYM% Porcentaje de Linfocitos 22,1 ↓ % ( 26,0 - 50,0 )  
-MON% Porcentaje de Monocitos 10,2 ↑ % ( 2,0 - 8,0 )  
-PLAS% Porcentaje de Plasmocitos 0,0  %   
-EO Número absoluto de Eosinófilos 0,07 ↓ x10^3/ul
- ( 0,10 - 0,50 )  
-BASOF Número absoluto de Basófilos 0,04  x10^3/ul
- ( 0,00 - 0,20 )  
-BLASTO Número absolutos de Blastos 0,00  x10^3/ul
-   
-PROMIE Número absoluto de Promielocitos 0,00  x10^3/ul
-   
-MIELOC Número absolutos de Mielocitos 0,00  x10^3/ul
-   
-JUVENI Número absoluto de Juveniles 0,00  x10^3/ul
-   
-BACILI Número aboluto de Baciliformes 0,00  x10^3/ul
- ( 0,00 - 0,20 )  
-SEGME Número absoluto de Segmentados 5,62  x10^3/ul
- ( 2,00 - 7,00 )  
-LYM Número absoluto de Linfocitos 1,87  x10^3/ul
- ( 1,00 - 4,80 )  
-MONO Número absoluto de Monocitos 0,86  x10^3/ul
-   
-PLASM Número absoluto de Plasmocitos 0,00  x10^3/ul
-   
+        // --- BIOQUÍMICA ---
+        {
+          key: 'got', preferred: 'GOT', short: 'GOT', essential: true,
+          abrs: ['TGO', 'GOT', 'AST'],
+          names: ['transaminasa got/ast', 'transaminasa got', 'got/ast', 'got', 'ast', 'aspartato aminotransferasa']
+        },
+        {
+          key: 'gpt', preferred: 'GPT', short: 'GPT', essential: true,
+          abrs: ['TGP', 'GPT', 'ALT'],
+          names: ['transaminasa gpt/alt', 'transaminasa gpt', 'gpt/alt', 'gpt', 'alt', 'alanina aminotransferasa']
+        },
+        {
+          key: 'ggt', preferred: 'GGT', short: 'GGT', essential: true,
+          abrs: ['GGT'],
+          names: ['ggt', 'gamma glutamil transferasa', 'gamma glutamil transpeptidasa', 'gammaglutamiltransferasa']
+        },
+        {
+          key: 'fa', preferred: 'Fosfatasa alcalina', short: 'FA', essential: true,
+          abrs: ['FAL', 'FA', 'ALP'],
+          names: ['fosfatasa alcalina']
+        },
+        {
+          key: 'bili_total', preferred: 'Bili total', short: 'BT', essential: true,
+          abrs: ['BILT', 'BT'],
+          names: ['bilirrubina total']
+        },
+        {
+          key: 'bili_directa', preferred: 'Bili directa', short: 'BD', essential: true,
+          abrs: ['BILD', 'BD'],
+          names: ['bilirrubina directa', 'bilirrubina conjugada']
+        },
+        {
+          key: 'bili_indirecta', preferred: 'Bili indirecta', short: 'BI', essential: false,
+          abrs: ['BILI', 'BI'],
+          names: ['bilirrubina indirecta']
+        },
+        {
+          key: 'ac_urico', preferred: 'Ac. Urico', short: 'Ac. Urico', essential: true,
+          abrs: ['URI', 'AURICO'],
+          names: ['acido urico']
+        },
+        {
+          key: 'col_total', preferred: 'Colesterol total', short: 'ColT', essential: true,
+          abrs: ['COL', 'COLT'],
+          names: ['colesterol total']
+        },
+        {
+          key: 'hdl', preferred: 'HDL', short: 'HDL', essential: false,
+          abrs: ['HDL'], names: ['colesterol hdl', 'hdl']
+        },
+        {
+          key: 'ldl', preferred: 'LDL', short: 'LDL', essential: false,
+          abrs: ['LDL'], names: ['colesterol ldl', 'ldl']
+        },
+        {
+          key: 'trig', preferred: 'TG', short: 'TG', essential: false,
+          abrs: ['TRIG', 'TG'], names: ['trigliceridos']
+        },
+        {
+          key: 'crea', preferred: 'Crea', short: 'Crea', essential: true,
+          abrs: ['CREAP', 'CREA', 'CRE'],
+          names: ['creatinina', 'creatinina plasmatica', 'creatinina serica', 'creatininemia']
+        },
+        {
+          key: 'calcio', preferred: 'Calcio', short: 'Ca', essential: true,
+          abrs: ['CA', 'CAL'],
+          names: ['calcio', 'calcio total', 'calcemia']
+        },
+        {
+          key: 'calcio_ionico', preferred: 'Ca iónico', short: 'Ca++', essential: true,
+          abrs: ['CAI', 'CA++'],
+          names: ['calcio ionico', 'calcio ionizado']
+        },
+        {
+          key: 'fosforo', preferred: 'Fosforo', short: 'P', essential: true,
+          abrs: ['FOS', 'P', 'FOSF'],
+          names: ['fosforo', 'fosfemia', 'fosfato']
+        },
+        {
+          key: 'magnesio', preferred: 'Mg', short: 'Mg', essential: true,
+          abrs: ['MG', 'MAG'],
+          names: ['magnesio', 'magnesemia']
+        },
+        {
+          key: 'prot_total', preferred: 'Prot total', short: 'ProtT', essential: true,
+          abrs: ['PROT', 'PT'],
+          names: ['proteinas totales', 'proteina total']
+        },
+        {
+          key: 'albumina', preferred: 'Albumina', short: 'Alb', essential: true,
+          abrs: ['ALB'],
+          names: ['albumina', 'albuminemia']
+        },
+        {
+          key: 'glucosa', preferred: 'Glucosa', short: 'Glu', essential: true,
+          abrs: ['GLU', 'GLIC'],
+          names: ['glucosa', 'glicemia', 'glucemia']
+        },
+        {
+          key: 'na', preferred: 'Na', short: 'Na', essential: true, elpRole: 'Na',
+          abrs: ['NA', 'SOD'],
+          names: ['sodio', 'natremia', 'sodio plasmatico']
+        },
+        {
+          key: 'k', preferred: 'K', short: 'K', essential: true, elpRole: 'K',
+          abrs: ['K', 'POT'],
+          names: ['potasio', 'kalemia', 'potasio plasmatico']
+        },
+        {
+          key: 'cl', preferred: 'Cl', short: 'Cl', essential: true, elpRole: 'Cl',
+          abrs: ['CL', 'CLO'],
+          names: ['cloro', 'cloremia', 'cloro plasmatico']
+        },
+        {
+          key: 'bun', preferred: 'Nitrógeno ureico', short: 'BUN', essential: true,
+          abrs: ['NU', 'BUN'],
+          names: ['nitrogeno ureico en sangre', 'nitrogeno ureico', 'bun']
+        },
+        {
+          key: 'urea', preferred: 'UREA', short: 'Urea', essential: true,
+          abrs: ['UREA', 'URE'],
+          names: ['urea', 'uremia']
+        },
+        {
+          key: 'pcr', preferred: 'PCR', short: 'PCR', essential: true,
+          abrs: ['PCR', 'CRP'],
+          names: ['proteina c reactiva', 'pcr', 'proteina c reactiva ultrasensible']
+        },
+
+        // --- COAGULACIÓN (con orden clínico explícito: TP -> Porcentaje protrombina -> INR -> TTPA) ---
+        {
+          key: 'tp', preferred: 'TP', short: 'TP', essential: true, sortPriority: 10,
+          abrs: ['TP'],
+          names: ['tiempo de protrombina', 'tiempo protrombina']
+        },
+        {
+          key: 'tp_pct', preferred: 'Porcentaje de protrombina', short: 'Protrombina', essential: true,
+          appendPercent: true, sortPriority: 20,
+          abrs: ['TP%'],
+          names: ['porcentaje de protrombina', 'protrombina %', 'actividad de protrombina']
+        },
+        {
+          key: 'inr', preferred: 'INR', short: 'INR', essential: true, sortPriority: 30,
+          abrs: ['INR'],
+          names: ['inr']
+        },
+        {
+          key: 'ttpa', preferred: 'TTPA', short: 'TTPA', essential: true, sortPriority: 40,
+          abrs: ['TTPA', 'APTT', 'TTPK'],
+          names: ['ttpa', 'ttpk', 'tiempo de tromboplastina parcial activada', 'tiempo de tromboplastina parcial activado']
+        },
+        {
+          key: 'fibrinogeno', preferred: 'Fibrinógeno', short: 'Fib', essential: true, sortPriority: 50,
+          abrs: ['FIBRI', 'FIB'],
+          names: ['fibrinogeno']
+        },
+        {
+          key: 'dimero_d', preferred: 'Dímero D', short: 'DD', essential: true, sortPriority: 60,
+          abrs: ['DDIM', 'DD'],
+          names: ['dimero d', 'dimero-d']
+        },
+
+        // --- GASES / GASOMETRÍA ---
+        {
+          key: 'presion_baro', preferred: 'Presión barométrica', short: 'PBar', essential: false,
+          abrs: ['PBAR'],
+          names: ['presion barometrica']
+        },
+        {
+          key: 'temperatura_gas', preferred: 'Temperatura', short: 'Temp', essential: false,
+          abrs: ['TEMP'],
+          names: ['temperatura']
+        },
+        {
+          key: 'ph', preferred: 'pH', short: 'pH', essential: true,
+          abrs: ['PH'],
+          names: ['ph', 'ph sangre', 'ph arterial', 'ph venoso']
+        },
+        {
+          key: 'pco2', preferred: 'PCO2', short: 'PCO2', essential: true,
+          abrs: ['PCO2'],
+          names: ['pco2', 'pco2 arterial', 'pco2 venoso']
+        },
+        {
+          key: 'po2', preferred: 'PO2', short: 'PO2', essential: true,
+          abrs: ['PO2'],
+          names: ['po2', 'po2 arterial', 'po2 venoso']
+        },
+        {
+          key: 'hco3', preferred: 'HCO3', short: 'HCO3', essential: true,
+          abrs: ['HCO3'],
+          names: ['hco3', 'hco3-', 'bicarbonato', 'hco3 actual', 'hco3 estandar']
+        },
+        {
+          key: 'tco2', preferred: 'TCO2', short: 'TCO2', essential: false,
+          abrs: ['TCO2'],
+          names: ['tco2', 'co2 total']
+        },
+        {
+          key: 'eb', preferred: 'EB', short: 'EB', essential: true,
+          abrs: ['EB', 'BE'],
+          names: ['eb', 'be', 'exceso de base', 'exceso de bases']
+        },
+        {
+          key: 'ebecf', preferred: 'EBecf', short: 'EBecf', essential: true,
+          abrs: ['EBECF', 'BEECF'],
+          names: ['ebecf', 'eb ecf', 'beecf', 'be(ecf)', 'eb(ecf)']
+        },
+        {
+          key: 'bb', preferred: 'BB', short: 'BB', essential: false,
+          abrs: ['BB'],
+          names: ['bb', 'buffer base']
+        },
+        {
+          key: 'sato2', preferred: 'SatO2', short: 'SatO2', essential: true,
+          abrs: ['SATO2', 'SO2'],
+          names: ['sato2', 'so2', 'saturacion de oxigeno', 'saturacion o2']
+        },
+        {
+          key: 'lactato', preferred: 'Lactato', short: 'Lac', essential: true,
+          abrs: ['LAC', 'LACT'],
+          names: ['lactato', 'acido lactico']
+        },
+        {
+          key: 'tipo_gas', preferred: 'Tipo Gas', short: 'Tipo Gas', essential: false,
+          abrs: ['TIPOGAS'],
+          names: ['tipo gas', 'tipo de gas', 'muestra gas', 'tipo muestra']
+        },
+
+        // --- OTROS EXÁMENES CLÍNICOS FRECUENTES ---
+        {
+          key: 'ldh', preferred: 'LDH', short: 'LDH', essential: true,
+          abrs: ['LDH'], names: ['ldh', 'lactato deshidrogenasa', 'deshidrogenasa lactica']
+        },
+        {
+          key: 'ck', preferred: 'CK', short: 'CK', essential: true,
+          abrs: ['CK', 'CPK'], names: ['ck', 'cpk', 'ck total', 'creatinquinasa', 'creatinkinasa']
+        },
+        {
+          key: 'ckmb', preferred: 'CK-MB', short: 'CK-MB', essential: true,
+          abrs: ['CKMB'], names: ['ck-mb', 'ck mb', 'cpk-mb']
+        },
+        {
+          key: 'tropo', preferred: 'Troponina', short: 'Tropo', essential: true,
+          abrs: ['TROPO', 'TROP', 'TNI', 'TNT'],
+          names: ['troponina', 'troponina i', 'troponina t', 'troponina ultrasensible', 'troponina i ultrasensible', 'troponina t ultrasensible']
+        },
+        {
+          key: 'ntprobnp', preferred: 'NT-proBNP', short: 'proBNP', essential: true,
+          abrs: ['PROBNP', 'NTPROBNP', 'BNP'],
+          names: ['nt-probnp', 'nt probnp', 'probnp', 'bnp']
+        },
+        {
+          key: 'procal', preferred: 'Procalcitonina', short: 'PCT', essential: true,
+          abrs: ['PROCAL', 'PCT'],
+          names: ['procalcitonina', 'pct']
+        },
+        {
+          key: 'amilasa', preferred: 'Amilasa', short: 'Amilasa', essential: true,
+          abrs: ['AMIL'], names: ['amilasa', 'amilasemia']
+        },
+        {
+          key: 'lipasa', preferred: 'Lipasa', short: 'Lipasa', essential: true,
+          abrs: ['LIP'], names: ['lipasa', 'lipasemia']
+        },
+        {
+          key: 'tsh', preferred: 'TSH', short: 'TSH', essential: true,
+          abrs: ['TSH'], names: ['tsh', 'hormona tiroestimulante']
+        },
+        {
+          key: 't4l', preferred: 'T4L', short: 'T4L', essential: true,
+          abrs: ['T4L', 'FT4'], names: ['t4 libre', 't4l', 'tiroxina libre']
+        },
+        {
+          key: 'hba1c', preferred: 'HbA1c', short: 'HbA1c', essential: true,
+          abrs: ['HBA1C'], names: ['hba1c', 'hemoglobina glicosilada', 'hemoglobina glucosilada']
+        },
+        {
+          key: 'ferritina', preferred: 'Ferritina', short: 'Ferritina', essential: true,
+          abrs: ['FERRI', 'FERR'], names: ['ferritina']
+        }
+      ];
+
+      // Índices rápidos de búsqueda para el catálogo
+      const CATALOG_BY_ABR = new Map();
+      const CATALOG_BY_NAME = new Map();
+      for (const entry of EXAM_CATALOG) {
+        for (const a of entry.abrs) {
+          CATALOG_BY_ABR.set(a.toUpperCase(), entry);
+        }
+        for (const n of entry.names) {
+          CATALOG_BY_NAME.set(normalizeText(n), entry);
+        }
+      }
+
+      /**
+       * Busca una entrada canónica del catálogo por abreviatura o nombre normalizado.
+       */
+      function lookupCatalog(abr, nombre) {
+        if (abr) {
+          const byAbr = CATALOG_BY_ABR.get(abr.toUpperCase());
+          if (byAbr) return byAbr;
+        }
+        const normName = normalizeText(nombre);
+        if (CATALOG_BY_NAME.has(normName)) {
+          return CATALOG_BY_NAME.get(normName);
+        }
+        // Coincidencias parciales controladas para variantes hospitalarias
+        if (normName.includes('troponina')) return EXAM_CATALOG.find(e => e.key === 'tropo');
+        if (normName.includes('procalcitonina')) return EXAM_CATALOG.find(e => e.key === 'procal');
+        if (normName.includes('nt-probnp') || normName.includes('probnp')) return EXAM_CATALOG.find(e => e.key === 'ntprobnp');
+        if (normName.includes('proteina c reactiva')) return EXAM_CATALOG.find(e => e.key === 'pcr');
+        if (normName.includes('nitrogeno ureico')) return EXAM_CATALOG.find(e => e.key === 'bun');
+        if (normName.includes('fosfatasa alcalina')) return EXAM_CATALOG.find(e => e.key === 'fa');
+        if (normName.includes('hemoglobina glicosilada') || normName.includes('hemoglobina glucosilada')) {
+          return EXAM_CATALOG.find(e => e.key === 'hba1c');
+        }
+        return null;
+      }
+
+      /* =========================================================================
+         3. TEXTOS DE EJEMPLO (EXACTO DEL USUARIO + EJEMPLO MULTI-DÍA)
+         ========================================================================= */
+      const SAMPLE_MAIN = `Sección Hematología 
+ HEMOGRAMA  21-11-2026 10:23    
+ Recuento leucocitos 8,47 21-11-2026 10:23  x10^3/ul
+ ( 4,50 - 11,00 ) 
+ Recuento de Eritrocitos 3,06 21-11-2026 10:23 ↓ x10^6/ul
+ ( 4,00 - 5,20 ) 
+ Hemoglobina 8,5 21-11-2026 10:23 ↓ g/dL ( 13,5 - 17,2 ) 
+ Hematocrito 28,2 21-11-2026 10:23 ↓ % ( 42,0 - 54,0 ) 
+ Volumen Corpuscular Medio 92,2 21-11-2026 10:23  fL ( 82,0 - 96,0 ) 
+ Hemoglobina Corpuscular Media 27,8 21-11-2026 10:23 ↓ Pg ( 28,0 - 32,0 ) 
+ Concentración Hemoglobina
+Corpuscular Media 30,1 21-11-2026 10:23 ↓ g/dL ( 32,0 - 36,0 ) 
+ Plaquetas 81 21-11-2026 10:23 ↓ x10^3/ul
+ ( 140 - 440 ) 
+ Porcentaje de Eosinófilos 0,8 21-11-2026 10:23 ↓ % ( 1,0 - 5,0 ) 
+ Porcentaje de Basófilos 0,5 21-11-2026 10:23  % ( 0,0 - 1,0 ) 
+ Porcentaje de Blastos 0,0 21-11-2026 10:23  %  
+ Porcentaje de Promielocitos 0,0 21-11-2026 10:23  %  
+ Porcentaje de Mielocitos 0,0 21-11-2026 10:23  %  
+ Porcentaje de Juveniles 0,0 21-11-2026 10:23  %  
+ Porcentaje de Baciliformes 0,0 21-11-2026 10:23  %  
+ Porcentaje de Segmentados 66,4 21-11-2026 10:23  % ( 50,0 - 70,0 ) 
+ Porcentaje de Linfocitos 22,1 21-11-2026 10:23 ↓ % ( 26,0 - 50,0 ) 
+ Porcentaje de Monocitos 10,2 21-11-2026 10:23 ↑ % ( 2,0 - 8,0 ) 
+ Porcentaje de Plasmocitos 0,0 21-11-2026 10:23  %  
+ Número absoluto de Eosinófilos 0,07 21-11-2026 10:23 ↓ x10^3/ul
+ ( 0,10 - 0,50 ) 
+ Número absoluto de Basófilos 0,04 21-11-2026 10:23  x10^3/ul
+ ( 0,00 - 0,20 ) 
+ Número absolutos de Blastos 0,00 21-11-2026 10:23  x10^3/ul
+  
+ Número absoluto de Promielocitos 0,00 21-11-2026 10:23  x10^3/ul
+  
+ Número absolutos de Mielocitos 0,00 21-11-2026 10:23  x10^3/ul
+  
+ Número absoluto de Juveniles 0,00 21-11-2026 10:23  x10^3/ul
+  
+ Número aboluto de Baciliformes 0,00 21-11-2026 10:23  x10^3/ul
+ ( 0,00 - 0,20 ) 
+ Número absoluto de Segmentados 5,62 21-11-2026 10:23  x10^3/ul
+ ( 2,00 - 7,00 ) 
+ Número absoluto de Linfocitos 1,87 21-11-2026 10:23  x10^3/ul
+ ( 1,00 - 4,80 ) 
+ Número absoluto de Monocitos 0,86 21-11-2026 10:23  x10^3/ul
+  
+ Número absoluto de Plasmocitos 0,00 21-11-2026 10:23  x10^3/ul
+  
 Sección Bioquímica 
-TGO Transaminasa GOT/AST 27  U/L ( 0 - 40 )  
-FAL Fosfatasa alcalina 128  U/L ( 40 - 130 )  
-BILT Bilirrubina total 0,53  mg/dL ( 0,00 - 1,20 )  
-URI Acido urico 5,7  mg/dL ( 3,4 - 7,0 )  
-COL Colesterol total 59  mg/dL ( 0 - 200 )  
-CREAP Creatinina 4,48 ↑ mg/dL ( 0,67 - 1,17 )  
-CA Calcio 7,7 ↓ mg/dL ( 8,6 - 10,2 )  
-FOS Fosforo 3,2  mg/dL ( 2,5 - 4,5 )  
-PROT Proteinas totales 6,5  g/dL ( 6,4 - 8,3 )  
-ALB Albumina 1,84 ↓ g/dL ( 3,90 - 4,90 )  
-GLU Glucosa 88  mg/dL ( 74 - 115 )  
-NA Sodio 134,0 ↓ meq/L ( 136,0 - 145,0 )  
-K Potasio 3,34 ↓ meq/L ( 3,50 - 5,10 )  
-CL Cloro 99,6  meq/L ( 98,0 - 107,0 )  
-NU Nitrogeno Ureico en Sangre 27 ↑ mg/dL ( 6 - 20 )  
-UREA UREA 57,10 ↑ mg/dL ( 16,60 - 48,50 )  
-PCR Proteina C reactiva 13,24 ↑ mg/dL ( 0,00 - 0,50 )  
+ Transaminasa GOT/AST 27 21-11-2026 10:17  U/L ( 0 - 40 ) 
+ Fosfatasa alcalina 128 21-11-2026 10:17  U/L ( 40 - 130 ) 
+ Bilirrubina total 0,53 21-11-2026 10:17  mg/dL ( 0,00 - 1,20 ) 
+ Acido urico 5,7 21-11-2026 10:17  mg/dL ( 3,4 - 7,0 ) 
+ Colesterol total 59 21-11-2026 10:17  mg/dL ( 0 - 200 ) 
+ Creatinina 4,48 21-11-2026 10:17 ↑ mg/dL ( 0,67 - 1,17 ) 
+ Calcio 7,7 21-11-2026 10:17 ↓ mg/dL ( 8,6 - 10,2 ) 
+ Fosforo 3,2 21-11-2026 10:17  mg/dL ( 2,5 - 4,5 ) 
+ Proteinas totales 6,5 21-11-2026 10:17  g/dL ( 6,4 - 8,3 ) 
+ Albumina 1,84 21-11-2026 10:16 ↓ g/dL ( 3,90 - 4,90 ) 
+ Glucosa 88 21-11-2026 10:17  mg/dL ( 74 - 115 ) 
+ Sodio 134,0 21-11-2026 10:17 ↓ meq/L ( 136,0 - 145,0 ) 
+ Potasio 3,34 21-11-2026 10:17 ↓ meq/L ( 3,50 - 5,10 ) 
+ Cloro 99,6 21-11-2026 10:17  meq/L ( 98,0 - 107,0 ) 
+ Nitrogeno Ureico en Sangre 27 21-11-2026 10:17 ↑ mg/dL ( 6 - 20 ) 
+ UREA 57,10 21-11-2026 10:17 ↑ mg/dL ( 16,60 - 48,50 ) 
+ Proteina C reactiva 13,24 21-11-2026 10:17 ↑ mg/dL ( 0,00 - 0,50 ) 
 Sección Coagulación 
-TP% Porcentaje de Protrombina 73,0 ↓ % ( 75,0 - 115,0 )  
-TP Tiempo de Protrombina 15,9  seg ( 12,3 - 15,9 )  
-INR INR 1,24   ( 4,50 )  
-TTPA TTPA 42,2 ↑ seg ( 25,0 - 35,0 )  `;
+ Porcentaje de Protrombina 73,0 21-11-2026 10:16 ↓ % ( 75,0 - 115,0 ) 
+ Tiempo de Protrombina 15,9 21-11-2026 10:16  seg ( 12,3 - 15,9 ) 
+ INR 1,24 21-11-2026 10:16   ( 4,50 ) 
+ TTPA 42,2 21-11-2026 10:16 ↑ seg ( 25,0 - 35,0 ) 
 
-    // 4. Estado global de la aplicación
-    const state = {
-      exams: [],              // Lista de objetos examen parseados
-      selectedIds: new Set(), // IDs de exámenes seleccionados
-      detectedDate: null,     // Fecha detectada (string ej. "21-11-2026")
-      searchQuery: '',        // Filtro de búsqueda actual
-      isManualEdit: false,    // Si el usuario editó manualmente el resultado
-      options: {
-        labelMode: 'short',   // 'short' | 'abr' | 'full'
-        separator: ' / ',
-        decimalMode: 'keep',  // 'keep' | 'dot'
-        groupBySection: true,
-        includeFlags: false,
-        includeUnits: false,
-        includeDate: true
-      }
-    };
 
-    // Referencias al DOM
-    const dom = {
-      rawInput: document.getElementById('rawInput'),
-      btnLoadExample: document.getElementById('btnLoadExample'),
-      btnClear: document.getElementById('btnClear'),
-      parseStatus: document.getElementById('parseStatus'),
-      dateBadge: document.getElementById('dateBadge'),
-      dateBadgeText: document.getElementById('dateBadgeText'),
-      labelModeBtns: document.querySelectorAll('.label-mode-btn'),
-      separatorSelect: document.getElementById('separatorSelect'),
-      decimalSelect: document.getElementById('decimalSelect'),
-      optGroupBySection: document.getElementById('optGroupBySection'),
-      optIncludeFlags: document.getElementById('optIncludeFlags'),
-      optIncludeUnits: document.getElementById('optIncludeUnits'),
-      optIncludeDate: document.getElementById('optIncludeDate'),
-      outputText: document.getElementById('outputText'),
-      selectedCountBadge: document.getElementById('selectedCountBadge'),
-      btnCopy: document.getElementById('btnCopy'),
-      btnCopyText: document.getElementById('btnCopyText'),
-      iconCopy: document.getElementById('iconCopy'),
-      iconCheck: document.getElementById('iconCheck'),
-      btnResetOutput: document.getElementById('btnResetOutput'),
-      manualEditNotice: document.getElementById('manualEditNotice'),
-      btnSelectEssential: document.getElementById('btnSelectEssential'),
-      btnSelectAltered: document.getElementById('btnSelectAltered'),
-      btnSelectAll: document.getElementById('btnSelectAll'),
-      btnSelectNone: document.getElementById('btnSelectNone'),
-      searchInput: document.getElementById('searchInput'),
-      btnClearSearch: document.getElementById('btnClearSearch'),
-      examsContainer: document.getElementById('examsContainer'),
-      toastContainer: document.getElementById('toastContainer')
-    };
+Gases 
+ GASOMETRÍA  21-11-2026 10:06    
+ Presión Barometrica 1008,09 21-11-2026 10:06  mbar  
+ Temperatura 37,00 21-11-2026 10:06  Cº  
+ pH 7,417 21-11-2026 10:06   ( 7,350 - 7,450 ) 
+ PCO2 39,8 21-11-2026 10:06  mmHg ( 35,0 - 45,0 ) 
+ PO2 36,8 21-11-2026 10:06 ↓ mmHg ( 71,0 - 104,0 ) 
+ HCO3 25,0 21-11-2026 10:06  mmol/L ( 21,0 - 26,0 ) 
+ TCO2 21,9 21-11-2026 10:06  mmol/L ( 21,0 - 25,0 ) 
+ EB 0,6 21-11-2026 10:06  mmol/L ( -2,2 - 2,2 ) 
+ EBecf 0,5 21-11-2026 10:06  mmol/L  
+ BB 48,6 21-11-2026 10:06  mmol/L  
+ SatO2 71,4 21-11-2026 10:06 ↓ % ( 94,0 - 98,0 ) 
+ Tipo Gas VENOSO 21-11-2026 09:59`;
 
-    /**
-     * Muestra una notificación flotante temporal (reemplaza alert).
-     */
-    function showToast(message, type = 'info') {
-      const toast = document.createElement('div');
-      const colorClasses = {
-        success: 'bg-emerald-600 text-white',
-        info: 'bg-slate-800 text-white',
-        warning: 'bg-amber-600 text-white'
-      }[type] || 'bg-slate-800 text-white';
+      const SAMPLE_MULTI_DAY = `${SAMPLE_MAIN}
 
-      toast.className = `${colorClasses} px-4 py-2.5 rounded-xl shadow-lg text-xs sm:text-sm font-medium flex items-center gap-2 transition-all duration-300 translate-y-2 opacity-0 pointer-events-auto`;
-      toast.textContent = message;
-      dom.toastContainer.appendChild(toast);
 
-      requestAnimationFrame(() => {
-        toast.classList.remove('translate-y-2', 'opacity-0');
-      });
+Sección Coagulación
+ TTPA 93,5 23-11-2026 08:15 ↑ seg ( 25,0 - 35,0 )
+ TTPA 43,4 24-11-2026 02:00 ↑ seg ( 25,0 - 35,0 )
+ TTPA 25,9 24-11-2026 07:00  seg ( 25,0 - 35,0 )
+ TTPA 64,1 24-11-2026 15:00 ↑ seg ( 25,0 - 35,0 )
+ TTPA 57 24-11-2026 19:18 ↑ seg ( 25,0 - 35,0 )`;
 
-      setTimeout(() => {
-        toast.classList.add('translate-y-2', 'opacity-0');
-        setTimeout(() => toast.remove(), 300);
-      }, 2400);
-    }
+      /* =========================================================================
+         4. MOTOR DE PARSING UNIVERSAL PARA SICLOPE (FORMATO B + FORMATO A)
+         ========================================================================= */
 
-    /**
-     * Verifica si una línea contiene un valor de laboratorio válido (numérico o cualitativo).
-     */
-    function lineHasNumericValue(line) {
-      // Quitar intervalo de referencia entre paréntesis al final para no confundirlo con el valor
-      const withoutRef = line.replace(/\s*\([^)]*\)\s*$/, '').trim();
-      // Buscar un número aislado precedido por espacio/tab (con soporte para <, >, <=, >=)
-      return /\s(?:[<>]=?\s*)?\d+(?:[.,]\d+)?(?:\s|$|[↑↓])/.test(withoutRef);
-    }
+      // Secciones independientes reconocidas incluso sin la palabra "Sección"
+      const STANDALONE_SECTIONS = new Set([
+        'gases', 'gasometria', 'orina', 'orina completa', 'sedimento',
+        'sedimento urinario', 'inmunologia', 'hormonas', 'endocrinologia',
+        'microbiologia', 'liquidos', 'liquidos biologicos', 'bioquimica',
+        'hematologia', 'coagulacion', 'serologia', 'marcadores',
+        'marcadores cardiacos', 'perfil hepatico', 'perfil lipidico',
+        'perfil renal', 'electrolitos', 'quimica clinica', 'uroanalisis',
+        'parasitologia', 'otros'
+      ]);
 
-    /**
-     * Verifica si el primer token de una línea parece ser un código de abreviatura de Siclope.
-     * Ej: RLEUC, HGB, EOS%, CREAP, NA, TP%, TGO, INR.
-     */
-    function startsWithSiclopeCode(line) {
-      const match = line.trim().match(/^(\S+)/);
-      if (!match) return false;
-      const firstToken = match[1];
-      // Los códigos en Siclope están en mayúsculas, números y símbolos como %, -, _, /
-      return /^[A-ZÁÉÍÓÚÑ0-9%/_-]{1,14}$/.test(firstToken) && /[A-Z]/.test(firstToken);
-    }
+      // Regex de valores cualitativos frecuentes en laboratorio clínico
+      const QUALITATIVE_VALUES_RE = /^(.*?)\s+(VENOSO|VENOSA|ARTERIAL|CAPILAR|MIXTO|MIXTA|NEGATIVO|POSITIVO|NO REACTIVO|REACTIVO|INDETERMINADO|NORMAL|ANORMAL|AUSENTE|PRESENTE|TRAZAS|ESCASO|ESCASOS|MODERADO|MODERADOS|ABUNDANTE|ABUNDANTES|AMARILLO|AMBAR|CLARO|LIMPIDO|TURBIO|LIGERAMENTE TURBIO|OPALESCENTE|INCOLORO|ROJIZO|SANGUINOLENTO|\+{1,4})$/i;
 
-    /**
-     * Determina si una línea es ruido / cabecera administrativa de Openlab que debe ignorarse.
-     */
-    function isIgnoredHeaderLine(line) {
-      const trimmed = line.trim();
-      if (!trimmed) return true;
-      if (/^Abr\s+Nombre\s+Valor/i.test(trimmed)) return true;
-      if (/^Petición\s+\d+/i.test(trimmed)) return true;
-      if (/^(Médico|Paciente|Fecha|Ciudad|Servicio|Rut|Ficha)\s*:/i.test(trimmed)) return true;
-      return false;
-    }
+      // Regex de fecha y hora en Formato B: DD-MM-YYYY HH:MM (o DD/MM/YYYY)
+      const DATE_TIME_IN_ROW_RE = /^(.*?)\s+(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})(?:\s+(\d{1,2}:\d{2}(?::\d{2})?))?(?:\s+(.*))?$/;
 
-    /**
-     * Parsea una fila reconstruida en sus campos: abr, nombre, valor, flag, unidad, ref.
-     * Mantiene el valor estrictamente como STRING sin alteraciones.
-     */
-    function parseExamRow(rowText, sectionName, index) {
-      let working = rowText.trim();
-      if (!working) return null;
-
-      // 1. Extraer intervalo de referencia al final si existe: "( 4,50 - 11,00 )" o "( 4,50 )"
-      let ref = '';
-      const refMatch = working.match(/\s*\(([^)]+)\)\s*$/);
-      if (refMatch) {
-        ref = refMatch[1].trim();
-        working = working.slice(0, refMatch.index).trim();
+      /**
+       * Convierte una fecha "DD-MM-YYYY" o "DD/MM/YYYY" a:
+       * { sortKey: "YYYY-MM-DD", display: "DD/MM" }
+       */
+      function parseDateInfo(dateStr) {
+        if (!dateStr) return { sortKey: '__NODATE__', display: '' };
+        const m = dateStr.trim().match(/^(\d{1,2})[-/](\d{1,2})(?:[-/](\d{2,4}))?$/);
+        if (!m) return { sortKey: '__NODATE__', display: dateStr.trim() };
+        const dd = m[1].padStart(2, '0');
+        const mm = m[2].padStart(2, '0');
+        let yyyy = m[3] || '2099';
+        if (yyyy.length === 2) yyyy = '20' + yyyy;
+        return {
+          sortKey: `${yyyy}-${mm}-${dd}`,
+          display: `${dd}/${mm}`
+        };
       }
 
-      // 2. Si el texto conserva tabulaciones claras de tabla HTML (3+ columnas separadas por \t)
-      if (working.includes('\t')) {
-        const cols = working.split('\t').map(c => c.trim());
-        if (cols.length >= 3 && cols[0] && cols[2]) {
-          const abr = cols[0];
-          const nombre = cols[1] || abr;
-          let valor = cols[2];
-          let flag = cols[3] || '';
-          let unidad = cols[4] || '';
-
-          // A veces el flag viene pegado al valor o en la misma celda
-          const valFlagMatch = valor.match(/^(.+?)\s*([↑↓])$/);
-          if (valFlagMatch) {
-            valor = valFlagMatch[1].trim();
-            flag = valFlagMatch[2];
-          }
-
-          if (valor && !/^[A-Z\s]+$/.test(valor) || /^(NEGATIVO|POSITIVO|REACTIVO|NO REACTIVO|NORMAL|AUSENTE|TRAZAS|ESCASO|MODERADO|ABUNDANTE|\+{1,4})$/i.test(valor)) {
-            return buildExamObject(index, sectionName, abr, nombre, valor, flag, unidad, ref);
+      /**
+       * Verifica si una línea es encabezado de sección (con o sin la palabra "Sección").
+       */
+      function detectSectionHeader(line) {
+        const trimmed = line.trim();
+        const secMatch = trimmed.match(/^Secci[oó]n\s+(.+)$/i);
+        if (secMatch) {
+          return secMatch[1].trim();
+        }
+        // Encabezado independiente (sin números ni fechas)
+        if (!/\d/.test(trimmed) && trimmed.length <= 35) {
+          const norm = normalizeText(trimmed);
+          if (STANDALONE_SECTIONS.has(norm)) {
+            return trimmed;
           }
         }
+        return null;
       }
 
-      // 3. Parsing robusto basado en espacios (formato estándar al copiar de Siclope/Openlab)
-      // Extraer abreviatura (primer token)
-      const firstSplit = working.match(/^(\S+)\s+(.+)$/);
-      if (!firstSplit) return null;
-
-      const abr = firstSplit[1].trim();
-      const rest = firstSplit[2].trim();
-
-      // A) Intentar extraer valor NUMÉRICO (entero, decimal con coma o punto, con opcional <, >, <=, >=)
-      // Usamos un regex que captura: nombre | valor exacto | flag opcional (↑/↓) | unidad opcional
-      const numericRegex = /^(.*?)\s+((?:[<>]=?\s*)?\d+(?:[.,]\d+)?)(?:\s+([↑↓]))?(?:\s+(.*))?$/;
-      const numMatch = rest.match(numericRegex);
-
-      if (numMatch) {
-        const nombre = numMatch[1].trim();
-        const valor = numMatch[2].trim(); // STRING EXACTO, nunca parseFloat
-        let flag = (numMatch[3] || '').trim();
-        let unidad = (numMatch[4] || '').trim();
-
-        // Por si la flecha quedó al inicio de la unidad por espacios irregulares
-        if (!flag && /^[↑↓](\s|$)/.test(unidad)) {
-          flag = unidad[0];
-          unidad = unidad.slice(1).trim();
-        }
-
-        // Limpiar espacios múltiples en unidad o nombre
-        const cleanNombre = nombre.replace(/\s+/g, ' ');
-        const cleanUnidad = unidad.replace(/\s+/g, ' ');
-
-        if (cleanNombre && valor) {
-          return buildExamObject(index, sectionName, abr, cleanNombre, valor, flag, cleanUnidad, ref);
-        }
+      /**
+       * Verifica si una línea es cabecera administrativa o de tabla que debe ignorarse.
+       */
+      function isIgnoredAdminLine(line) {
+        const t = line.trim();
+        if (!t) return true;
+        if (/^Abr\s+Nombre\s+Valor/i.test(t)) return true;
+        if (/^Nombre\s+Valor\s+Fecha/i.test(t)) return true;
+        if (/^Petición\s+\d+/i.test(t)) return true;
+        if (/^(Médico|Paciente|Fecha|Ciudad|Servicio|Rut|Ficha)\s*:/i.test(t)) return true;
+        return false;
       }
 
-      // B) Fallback para resultados CUALITATIVOS comunes (ej. Orina, Serología)
-      const qualRegex = /^(.*?)\s+(NEGATIVO|POSITIVO|NO REACTIVO|REACTIVO|NORMAL|AUSENTE|TRAZAS|ESCASO|ESCASOS|MODERADO|MODERADOS|ABUNDANTE|ABUNDANTES|AMARILLO|CLARO|TURBIO|LIGERAMENTE TURBIO|PRESENTE|\+{1,4})(?:\s+([↑↓]))?(?:\s+(.*))?$/i;
-      const qualMatch = rest.match(qualRegex);
-      if (qualMatch) {
-        const nombre = qualMatch[1].trim().replace(/\s+/g, ' ');
-        const valor = qualMatch[2].trim();
-        const flag = (qualMatch[3] || '').trim();
-        const unidad = (qualMatch[4] || '').trim().replace(/\s+/g, ' ');
-        if (nombre && valor) {
-          return buildExamObject(index, sectionName, abr, nombre, valor, flag, unidad, ref);
-        }
+      /**
+       * Detecta si una línea parece un título de panel en mayúsculas sin valor
+       * (ej: "HEMO HEMOGRAMA", "HEMOGRAMA", "PERFIL BIOQUIMICO").
+       */
+      function isAllCapsPanelTitle(line) {
+        const t = line.trim();
+        return /^[A-ZÁÉÍÓÚÑ0-9\s/.-]+$/.test(t) && /[A-ZÁÉÍÓÚÑ]/.test(t) && !/\d+[.,]\d+/.test(t);
       }
 
-      // Si no tiene valor (ej. "HEMO HEMOGRAMA"), se descarta
-      return null;
-    }
-
-    /**
-     * Construye el objeto normalizado de un examen.
-     */
-    function buildExamObject(index, seccion, abr, nombre, valor, flag, unidad, ref) {
-      const upperAbr = abr.toUpperCase();
-      const shortLabel = CLINICAL_SHORT_MAP[upperAbr] || abr;
-      return {
-        id: `exam_${index}_${upperAbr}`,
-        seccion,
-        abr,
-        upperAbr,
-        shortLabel,
-        nombre,
-        valor, // estrictamente string original
-        flag,  // '↑' | '↓' | ''
-        unidad,
-        ref
-      };
-    }
-
-    /**
-     * Motor principal de parsing para el texto pegado desde Siclope / Openlab.
-     */
-    function parseSiclopeText(rawText) {
-      const result = {
-        date: null,
-        exams: []
-      };
-
-      if (!rawText || !rawText.trim()) return result;
-
-      // 1. Detectar fecha en encabezados si existe (ej. "Fecha: 21-11-2026 0:00:00" o "Fecha: 21/11/2026")
-      const dateMatch = rawText.match(/Fecha\s*:\s*(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})/i);
-      if (dateMatch) {
-        result.date = dateMatch[1];
+      /**
+       * Verifica si una línea ya contiene una fecha DD-MM-YYYY o un valor numérico/cualitativo.
+       */
+      function lineLooksComplete(line) {
+        const noRef = line.replace(/\s*\([^)]*\)\s*$/, '').trim();
+        if (/\b\d{1,2}[-/]\d{1,2}[-/]\d{2,4}\b/.test(noRef)) return true;
+        if (/\s(?:[<>]=?\s*)?-?\d+(?:[.,]\d+)?(?:\s|$|[↑↓])/.test(noRef)) return true;
+        if (QUALITATIVE_VALUES_RE.test(noRef)) return true;
+        return false;
       }
 
-      // 2. Dividir en líneas limpiando retornos de carro
-      const rawLines = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
-
-      // 3. Reconstruir filas partidas en múltiples líneas
-      const reconstructed = []; // { type: 'section' | 'row', text: string }
-
-      for (let i = 0; i < rawLines.length; i++) {
-        const line = rawLines[i].trim();
-        if (!line) continue;
-        if (isIgnoredHeaderLine(line)) continue;
-
-        // Detectar sección dinámica
-        const sectionMatch = line.match(/^Secci[oó]n\s+(.+)$/i);
-        if (sectionMatch) {
-          reconstructed.push({ type: 'section', text: sectionMatch[1].trim() });
-          continue;
-        }
-
-        // Caso A: Línea que comienza con "(" -> es el intervalo de referencia partido de la línea anterior
-        if (line.startsWith('(')) {
-          if (reconstructed.length > 0 && reconstructed[reconstructed.length - 1].type === 'row') {
-            reconstructed[reconstructed.length - 1].text += ' ' + line;
-          }
-          continue;
-        }
-
-        // Caso B: Verificar si esta línea es la continuación del nombre+valor de la fila anterior
-        // Ejemplo:
-        // Anterior: "CHCM Concentración Hemoglobina" (sin valor numérico)
-        // Actual:   "Corpuscular Media 30,1 ↓ g/dL ( 32,0 - 36,0 )" (NO empieza con código Siclope ALL-CAPS)
-        if (reconstructed.length > 0 && reconstructed[reconstructed.length - 1].type === 'row') {
-          const prev = reconstructed[reconstructed.length - 1].text;
-          const prevHasValue = lineHasNumericValue(prev);
-          const currStartsCode = startsWithSiclopeCode(line);
-
-          if (!prevHasValue && !currStartsCode) {
-            reconstructed[reconstructed.length - 1].text += ' ' + line;
-            continue;
-          }
-        }
-
-        // Si no es continuación, agregar como nueva fila candidata
-        reconstructed.push({ type: 'row', text: line });
+      /**
+       * Verifica si el primer token parece código Abr de Openlab (MAYÚSCULAS).
+       */
+      function startsWithAbrCode(line) {
+        const m = line.trim().match(/^(\S+)\s+/);
+        if (!m) return false;
+        const tok = m[1];
+        return /^[A-ZÁÉÍÓÚÑ0-9%/_-]{1,12}$/.test(tok) && /[A-Z]/.test(tok);
       }
 
-      // 4. Extraer los exámenes agrupados por su sección
-      let currentSection = 'General';
-      let examIndex = 0;
-
-      for (const item of reconstructed) {
-        if (item.type === 'section') {
-          currentSection = item.text;
-          continue;
-        }
-
-        const parsed = parseExamRow(item.text, currentSection, examIndex);
-        if (parsed) {
-          result.exams.push(parsed);
-          examIndex++;
-        }
-      }
-
-      return result;
-    }
-
-    /**
-     * Formatea el valor respetando estrictamente la precisión numérica original.
-     * Únicamente realiza reemplazo de texto de coma a punto si está activado.
-     */
-    function formatExactValue(valorStr) {
-      if (state.options.decimalMode === 'dot') {
-        return valorStr.replace(/,/g, '.');
-      }
-      return valorStr;
-    }
-
-    /**
-     * Genera el texto de salida basado en los exámenes seleccionados y las opciones activas.
-     */
-    function generateOutputText() {
-      const selectedExams = state.exams.filter(ex => state.selectedIds.has(ex.id));
-      if (selectedExams.length === 0) return '';
-
-      const { labelMode, separator, groupBySection, includeFlags, includeUnits, includeDate } = state.options;
-      const realSep = separator === '\\n' ? '\n' : separator;
-
-      const formatSingleExam = (ex) => {
-        let label = ex.shortLabel;
-        if (labelMode === 'abr') label = ex.abr;
-        else if (labelMode === 'full') label = ex.nombre;
-
-        const val = formatExactValue(ex.valor);
-        let str = `${label} ${val}`;
-
-        if (includeFlags && ex.flag) {
-          str += ex.flag;
-        }
-        if (includeUnits && ex.unidad) {
-          str += ` ${ex.unidad}`;
-        }
-        return str;
-      };
-
-      let body = '';
-
-      if (groupBySection) {
-        // Agrupar manteniendo el orden original de aparición de las secciones
-        const sectionsMap = new Map();
-        for (const ex of selectedExams) {
-          if (!sectionsMap.has(ex.seccion)) {
-            sectionsMap.set(ex.seccion, []);
-          }
-          sectionsMap.get(ex.seccion).push(formatSingleExam(ex));
-        }
-
-        const sectionLines = [];
-        for (const [secName, items] of sectionsMap.entries()) {
-          if (realSep === '\n') {
-            sectionLines.push(`${secName}:\n${items.join('\n')}`);
-          } else {
-            sectionLines.push(`${secName}: ${items.join(realSep)}`);
-          }
-        }
-        body = sectionLines.join('\n');
-      } else {
-        body = selectedExams.map(formatSingleExam).join(realSep);
-      }
-
-      // Agregar fecha al inicio si está disponible y habilitada
-      if (includeDate && state.detectedDate) {
-        const prefix = `[${state.detectedDate}]`;
-        return groupBySection || realSep === '\n'
-          ? `${prefix}\n${body}`
-          : `${prefix} ${body}`;
-      }
-
-      return body;
-    }
-
-    /**
-     * Actualiza el panel de resultado y el contador de seleccionados.
-     */
-    function updateOutputUI(forceResetManual = false) {
-      const count = state.selectedIds.size;
-      dom.selectedCountBadge.textContent = count === 1 ? '1 seleccionado' : `${count} seleccionados`;
-      dom.btnCopy.disabled = count === 0 && !dom.outputText.value.trim();
-
-      if (forceResetManual) {
-        state.isManualEdit = false;
-      }
-
-      if (!state.isManualEdit) {
-        dom.outputText.value = generateOutputText();
-        dom.btnResetOutput.classList.add('hidden');
-        dom.manualEditNotice.classList.add('hidden');
-      }
-    }
-
-    /**
-     * Renderiza la lista interactiva de exámenes agrupada por secciones.
-     */
-    function renderExamsList() {
-      const container = dom.examsContainer;
-      container.innerHTML = '';
-
-      if (state.exams.length === 0) {
-        container.innerHTML = `
-          <div class="p-10 text-center">
-            <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 mx-auto flex items-center justify-center mb-3">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-              </svg>
-            </div>
-            <p class="text-sm font-medium text-slate-700">Aún no hay exámenes cargados</p>
-            <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-              Pega el texto copiado desde Siclope en el panel izquierdo o presiona <strong>"Cargar ejemplo"</strong> para probar el extractor.
-            </p>
-          </div>
-        `;
-        return;
-      }
-
-      // Filtrar por búsqueda
-      const query = state.searchQuery.trim().toLowerCase();
-      const filteredExams = query
-        ? state.exams.filter(ex =>
-            ex.nombre.toLowerCase().includes(query) ||
-            ex.abr.toLowerCase().includes(query) ||
-            ex.shortLabel.toLowerCase().includes(query) ||
-            ex.seccion.toLowerCase().includes(query)
-          )
-        : state.exams;
-
-      if (filteredExams.length === 0) {
-        container.innerHTML = `
-          <div class="p-8 text-center">
-            <p class="text-sm font-medium text-slate-600">No se encontraron exámenes para "${escapeHtml(state.searchQuery)}"</p>
-            <p class="text-xs text-slate-400 mt-1">Intenta con otra abreviatura o limpia el buscador.</p>
-          </div>
-        `;
-        return;
-      }
-
-      // Agrupar exámenes filtrados por sección
-      const sectionsMap = new Map();
-      for (const ex of filteredExams) {
-        if (!sectionsMap.has(ex.seccion)) {
-          sectionsMap.set(ex.seccion, []);
-        }
-        sectionsMap.get(ex.seccion).push(ex);
-      }
-
-      // Construir DOM por sección
-      for (const [secName, items] of sectionsMap.entries()) {
-        const sectionBlock = document.createElement('div');
-        sectionBlock.className = 'bg-white';
-
-        const selectedInSection = items.filter(ex => state.selectedIds.has(ex.id)).length;
-        const allSelected = selectedInSection === items.length && items.length > 0;
-        const someSelected = selectedInSection > 0 && selectedInSection < items.length;
-
-        // Cabecera de sección con checkbox maestro
-        const header = document.createElement('div');
-        header.className = 'px-4 py-2.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between sticky top-0 z-10';
-
-        const secLabel = document.createElement('label');
-        secLabel.className = 'flex items-center gap-2.5 cursor-pointer select-none';
-
-        const masterCb = document.createElement('input');
-        masterCb.type = 'checkbox';
-        masterCb.checked = allSelected;
-        masterCb.indeterminate = someSelected;
-        masterCb.className = 'w-4 h-4 rounded text-medical-600 focus:ring-medical-500 border-slate-300 cursor-pointer';
-        masterCb.addEventListener('change', () => {
-          const check = masterCb.checked;
-          for (const ex of items) {
-            if (check) state.selectedIds.add(ex.id);
-            else state.selectedIds.delete(ex.id);
-          }
-          renderExamsList();
-          updateOutputUI(true);
-        });
-
-        const secTitle = document.createElement('span');
-        secTitle.className = 'text-xs font-bold uppercase tracking-wider text-slate-700';
-        secTitle.textContent = secName;
-
-        secLabel.appendChild(masterCb);
-        secLabel.appendChild(secTitle);
-
-        const secCounter = document.createElement('span');
-        secCounter.className = 'text-[11px] font-medium text-slate-500 bg-white px-2 py-0.5 rounded-full border border-slate-200';
-        secCounter.textContent = `${selectedInSection} / ${items.length}`;
-
-        header.appendChild(secLabel);
-        header.appendChild(secCounter);
-        sectionBlock.appendChild(header);
-
-        // Lista de ítems de la sección
-        const listEl = document.createElement('div');
-        listEl.className = 'divide-y divide-slate-100';
-
-        for (const ex of items) {
-          const isChecked = state.selectedIds.has(ex.id);
-
-          const row = document.createElement('label');
-          row.className = `flex items-center justify-between gap-3 px-4 py-2.5 cursor-pointer transition-colors select-none ${
-            isChecked ? 'bg-medical-50/45 hover:bg-medical-50/75' : 'hover:bg-slate-50'
-          }`;
-
-          // Lado izquierdo: checkbox + nombres
-          const leftDiv = document.createElement('div');
-          leftDiv.className = 'flex items-center gap-3 min-w-0';
-
-          const cb = document.createElement('input');
-          cb.type = 'checkbox';
-          cb.checked = isChecked;
-          cb.className = 'w-4 h-4 rounded text-medical-600 focus:ring-medical-500 border-slate-300 shrink-0 cursor-pointer';
-          cb.addEventListener('change', () => {
-            if (cb.checked) state.selectedIds.add(ex.id);
-            else state.selectedIds.delete(ex.id);
-            renderExamsList();
-            updateOutputUI(true);
-          });
-
-          const textDiv = document.createElement('div');
-          textDiv.className = 'min-w-0';
-
-          const topLine = document.createElement('div');
-          topLine.className = 'flex items-center gap-1.5 flex-wrap';
-
-          const shortSpan = document.createElement('span');
-          shortSpan.className = 'text-sm font-semibold text-slate-800';
-          shortSpan.textContent = ex.shortLabel;
-          topLine.appendChild(shortSpan);
-
-          if (ex.shortLabel !== ex.abr) {
-            const abrSpan = document.createElement('span');
-            abrSpan.className = 'text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-500';
-            abrSpan.textContent = ex.abr;
-            topLine.appendChild(abrSpan);
-          }
-
-          const fullSpan = document.createElement('p');
-          fullSpan.className = 'text-xs text-slate-500 truncate';
-          fullSpan.title = ex.nombre;
-          fullSpan.textContent = ex.nombre;
-
-          textDiv.appendChild(topLine);
-          textDiv.appendChild(fullSpan);
-
-          leftDiv.appendChild(cb);
-          leftDiv.appendChild(textDiv);
-
-          // Lado derecho: valor exacto + flag + unidad + referencia
-          const rightDiv = document.createElement('div');
-          rightDiv.className = 'text-right shrink-0';
-
-          const valRow = document.createElement('div');
-          valRow.className = 'flex items-center justify-end gap-1.5';
-
-          // Colores según flag alterado
-          let valBadgeClass = 'text-slate-900 bg-slate-100 border-slate-200';
-          if (ex.flag === '↑') {
-            valBadgeClass = 'text-rose-700 bg-rose-50 border-rose-200';
-          } else if (ex.flag === '↓') {
-            valBadgeClass = 'text-blue-700 bg-blue-50 border-blue-200';
-          }
-
-          const valBadge = document.createElement('span');
-          valBadge.className = `inline-flex items-center gap-0.5 px-2 py-0.5 rounded-lg border text-sm font-mono font-semibold ${valBadgeClass}`;
-          valBadge.textContent = `${formatExactValue(ex.valor)}${ex.flag ? ' ' + ex.flag : ''}`;
-          valRow.appendChild(valBadge);
-
-          if (ex.unidad) {
-            const unitSpan = document.createElement('span');
-            unitSpan.className = 'text-xs text-slate-500 font-medium';
-            unitSpan.textContent = ex.unidad;
-            valRow.appendChild(unitSpan);
-          }
-
-          rightDiv.appendChild(valRow);
-
-          if (ex.ref) {
-            const refSpan = document.createElement('p');
-            refSpan.className = 'text-[11px] font-mono text-slate-400 mt-0.5';
-            refSpan.textContent = `Ref: ${ex.ref}`;
-            rightDiv.appendChild(refSpan);
-          }
-
-          row.appendChild(leftDiv);
-          row.appendChild(rightDiv);
-          listEl.appendChild(row);
-        }
-
-        sectionBlock.appendChild(listEl);
-        container.appendChild(sectionBlock);
-      }
-    }
-
-    /**
-     * Escapa caracteres HTML para evitar inyección en mensajes de búsqueda.
-     */
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    /**
-     * Procesa el texto de entrada y actualiza toda la interfaz.
-     */
-    function processInput(autoSelectEssential = true) {
-      try {
-        const raw = dom.rawInput.value;
-        const parsed = parseSiclopeText(raw);
-
-        state.exams = parsed.exams;
-        state.detectedDate = parsed.date;
-        state.selectedIds.clear();
-
-        // Actualizar indicador de fecha detectada
-        if (state.detectedDate) {
-          dom.dateBadgeText.textContent = state.detectedDate;
-          dom.dateBadge.classList.remove('hidden');
-          dom.dateBadge.classList.add('inline-flex');
+      /**
+       * Extrae flag (↑ / ↓) y unidad desde el fragmento posterior a valor/fecha.
+       */
+      function parseFlagAndUnit(rightStr) {
+        let s = (rightStr || '').trim();
+        let flag = '';
+        if (s.startsWith('↑') || s.startsWith('↓')) {
+          flag = s[0];
+          s = s.slice(1).trim();
         } else {
-          dom.dateBadge.classList.add('hidden');
-          dom.dateBadge.classList.remove('inline-flex');
+          // A veces la flecha viene al final
+          const endFlag = s.match(/^(.*?)\s*([↑↓])$/);
+          if (endFlag) {
+            s = endFlag[1].trim();
+            flag = endFlag[2];
+          }
+        }
+        return { flag, unidad: s.replace(/\s+/g, ' ').trim() };
+      }
+
+      /**
+       * Intenta separar "nombre" + "valor" de la parte izquierda de una fila.
+       * Devuelve null si no hay valor (ej. "HEMOGRAMA", "GASOMETRÍA").
+       */
+      function splitNameAndValue(leftStr) {
+        const clean = leftStr.trim();
+        if (!clean) return null;
+
+        // 1) Valor numérico al final (soporta negativos como -2,2 y prefijos <, >, <=, >=)
+        const numMatch = clean.match(/^(.*?)\s+((?:[<>]=?\s*)?-?\d+(?:[.,]\d+)?)$/);
+        if (numMatch) {
+          const nombre = numMatch[1].trim();
+          const valor = numMatch[2].trim(); // STRING EXACTO, jamás float
+          if (nombre && valor) {
+            return { nombre, valor, isQualitative: false };
+          }
         }
 
-        // Actualizar barra de estado
-        if (state.exams.length > 0) {
-          const sectionCount = new Set(state.exams.map(e => e.seccion)).size;
-          const alteredCount = state.exams.filter(e => e.flag).length;
-          dom.parseStatus.innerHTML = `
-            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
-            <span class="text-slate-700 font-medium">${state.exams.length} exámenes</span>
-            <span class="text-slate-400">·</span>
-            <span>${sectionCount} ${sectionCount === 1 ? 'sección' : 'secciones'}</span>
-            ${alteredCount > 0 ? `<span class="text-slate-400">·</span><span class="text-rose-600 font-medium">${alteredCount} alterados</span>` : ''}
-          `;
+        // 2) Valor cualitativo (ej: "Tipo Gas VENOSO", "Nitritos NEGATIVO")
+        const qualMatch = clean.match(QUALITATIVE_VALUES_RE);
+        if (qualMatch) {
+          const nombre = qualMatch[1].trim();
+          const valor = qualMatch[2].trim();
+          if (nombre && valor) {
+            return { nombre, valor, isQualitative: true };
+          }
+        }
 
-          // Selección inteligente inicial: esenciales si hay coincidencias, si no todos
-          if (autoSelectEssential) {
-            const essentials = state.exams.filter(ex => ESSENTIAL_CODES.has(ex.upperAbr));
-            if (essentials.length > 0) {
-              essentials.forEach(ex => state.selectedIds.add(ex.id));
-            } else {
-              state.exams.forEach(ex => state.selectedIds.add(ex.id));
+        return null;
+      }
+
+      /**
+       * Parsea una fila reconstruida en un objeto examen normalizado.
+       */
+      function parseSingleRow(rowText, sectionName, index, hasAbrHeader, headerDateInfo) {
+        let working = rowText.trim();
+        if (!working) return null;
+
+        // 1. Extraer intervalo de referencia al final: "( 4,50 - 11,00 )" o "( -2,2 - 2,2 )"
+        let ref = '';
+        const refMatch = working.match(/\s*\(([^)]+)\)\s*$/);
+        if (refMatch) {
+          ref = refMatch[1].trim();
+          working = working.slice(0, refMatch.index).trim();
+        }
+
+        // 2. INTENTO FORMATO B: Contiene fecha DD-MM-YYYY [HH:MM] dentro de la fila
+        const dateMatch = working.match(DATE_TIME_IN_ROW_RE);
+        if (dateMatch) {
+          const leftPart = dateMatch[1].trim();
+          const rawDate = dateMatch[2].trim();
+          const rawTime = (dateMatch[3] || '').trim().slice(0, 5); // HH:MM
+          const rightPart = (dateMatch[4] || '').trim();
+
+          const nv = splitNameAndValue(leftPart);
+          if (!nv) {
+            // Es un encabezado de panel con fecha, ej: "HEMOGRAMA 21-11-2026 10:23" o "GASOMETRÍA 21-11-2026 10:06"
+            return null;
+          }
+
+          let abr = '';
+          let nombre = nv.nombre.replace(/\s+/g, ' ').trim();
+
+          // Si además trajera columna Abr (caso híbrido), extraerla solo si el primer token es un Abr conocido y quedan más palabras
+          if (hasAbrHeader) {
+            const abrSplit = nombre.match(/^(\S+)\s+(.+)$/);
+            if (abrSplit && startsWithAbrCode(nombre)) {
+              abr = abrSplit[1];
+              nombre = abrSplit[2].trim();
             }
           }
-        } else {
-          dom.parseStatus.innerHTML = raw.trim()
-            ? `<span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span><span class="text-amber-700">No se detectaron filas con formato Siclope.</span>`
-            : `<span class="w-2 h-2 rounded-full bg-slate-300 inline-block"></span><span>Esperando exámenes...</span>`;
+
+          const { flag, unidad } = parseFlagAndUnit(rightPart);
+          const dateInfo = parseDateInfo(rawDate);
+
+          return buildExam(index, sectionName, abr, nombre, nv.valor, flag, unidad, ref, dateInfo, rawTime, 'B');
         }
 
+        // 3. INTENTO FORMATO A: Sin fecha en la fila (Openlab clásico con o sin columna Abr)
+        // Primero detectar valor numérico en el cuerpo: nombre + valor + [flag] + [unidad]
+        let abr = '';
+        let nombre = '';
+        let valor = '';
+        let flag = '';
+        let unidad = '';
+
+        // Probar tablas con tabulaciones explícitas
+        if (working.includes('\t')) {
+          const cols = working.split('\t').map(c => c.trim());
+          if (cols.length >= 3) {
+            if (hasAbrHeader && cols[0] && cols[1] && cols[2]) {
+              abr = cols[0];
+              nombre = cols[1];
+              valor = cols[2];
+              const fu = parseFlagAndUnit([cols[3] || '', cols[4] || ''].join(' '));
+              flag = fu.flag;
+              unidad = fu.unidad;
+            } else if (cols[0] && cols[1]) {
+              nombre = cols[0];
+              valor = cols[1];
+              const fu = parseFlagAndUnit([cols[2] || '', cols[3] || ''].join(' '));
+              flag = fu.flag;
+              unidad = fu.unidad;
+            }
+            // Limpiar flecha pegada al valor si existiera
+            const vf = valor.match(/^(.+?)\s*([↑↓])$/);
+            if (vf) {
+              valor = vf[1].trim();
+              flag = vf[2];
+            }
+            if (nombre && valor && (/^(?:[<>]=?\s*)?-?\d+(?:[.,]\d+)?$/.test(valor) || QUALITATIVE_VALUES_RE.test('x ' + valor))) {
+              return buildExam(index, sectionName, abr, nombre, valor, flag, unidad, ref, headerDateInfo, '', 'A');
+            }
+          }
+        }
+
+        // Parsing basado en espacios para Formato A
+        const numRowRe = /^(.*?)\s+((?:[<>]=?\s*)?-?\d+(?:[.,]\d+)?)(?:\s+([↑↓]))?(?:\s+(.*))?$/;
+        const numMatch = working.match(numRowRe);
+        if (numMatch) {
+          let leftName = numMatch[1].trim();
+          valor = numMatch[2].trim();
+          flag = (numMatch[3] || '').trim();
+          let restUnit = (numMatch[4] || '').trim();
+
+          if (!flag && (restUnit.startsWith('↑') || restUnit.startsWith('↓'))) {
+            flag = restUnit[0];
+            restUnit = restUnit.slice(1).trim();
+          }
+          unidad = restUnit.replace(/\s+/g, ' ').trim();
+
+          // Separar Abr del nombre si corresponde (ej. "RLEUC Recuento leucocitos", "INR INR", "TTPA TTPA")
+          const codeSplit = leftName.match(/^(\S+)\s+(.+)$/);
+          if (codeSplit && startsWithAbrCode(leftName) && (hasAbrHeader || CATALOG_BY_ABR.has(codeSplit[1].toUpperCase()) || codeSplit[1].toUpperCase() === codeSplit[2].toUpperCase())) {
+            abr = codeSplit[1].trim();
+            nombre = codeSplit[2].trim().replace(/\s+/g, ' ');
+          } else {
+            nombre = leftName.replace(/\s+/g, ' ');
+            if (CATALOG_BY_ABR.has(nombre.toUpperCase())) {
+              abr = nombre;
+            }
+          }
+
+          if (nombre && valor) {
+            return buildExam(index, sectionName, abr, nombre, valor, flag, unidad, ref, headerDateInfo, '', 'A');
+          }
+        }
+
+        // Fallback cualitativo en Formato A
+        const qualRowMatch = working.match(QUALITATIVE_VALUES_RE);
+        if (qualRowMatch) {
+          let leftName = qualRowMatch[1].trim();
+          valor = qualRowMatch[2].trim();
+          const codeSplit = leftName.match(/^(\S+)\s+(.+)$/);
+          if (codeSplit && startsWithAbrCode(leftName) && hasAbrHeader) {
+            abr = codeSplit[1].trim();
+            nombre = codeSplit[2].trim();
+          } else {
+            nombre = leftName;
+          }
+          if (nombre && valor) {
+            return buildExam(index, sectionName, abr, nombre, valor, '', '', ref, headerDateInfo, '', 'A');
+          }
+        }
+
+        return null;
+      }
+
+      /**
+       * Construye el objeto examen enriquecido con metadatos del catálogo clínico.
+       */
+      function buildExam(index, seccion, abr, nombre, valor, flag, unidad, ref, dateInfo, time, detectedFormat) {
+        const entry = lookupCatalog(abr, nombre);
+        const isGasSection = /gas/i.test(normalizeText(seccion));
+        return {
+          id: `ex_${index}`,
+          index,
+          seccion,
+          isGasSection,
+          abr,
+          nombre,
+          valor, // STRING EXACTO
+          flag,  // '↑' | '↓' | ''
+          unidad,
+          ref,
+          dateSort: dateInfo.sortKey,
+          dateDisplay: dateInfo.display,
+          time,  // 'HH:MM' o ''
+          detectedFormat,
+          canonicalKey: entry ? entry.key : `custom_${normalizeText(nombre)}`,
+          preferredLabel: entry ? entry.preferred : nombre,
+          shortLabel: entry ? entry.short : (abr || nombre),
+          essential: entry ? entry.essential : false,
+          appendPercent: entry ? Boolean(entry.appendPercent) : false,
+          sortPriority: entry && typeof entry.sortPriority === 'number' ? entry.sortPriority : 1000,
+          elpRole: entry ? (entry.elpRole || null) : null
+        };
+      }
+
+      /**
+       * Parsea un bloque completo de texto copiado desde Siclope / Openlab.
+       */
+      function parseSiclope(rawText) {
+        const output = {
+          exams: [],
+          formatSummary: ''
+        };
+
+        if (!rawText || !rawText.trim()) return output;
+
+        // Detectar pista de columna Abr y fecha en encabezado superior (Formato A)
+        const hasAbrHeader = /^Abr\s+Nombre\s+Valor/im.test(rawText);
+        let headerDateInfo = { sortKey: '__NODATE__', display: '' };
+        const hdrDateMatch = rawText.match(/Fecha\s*:\s*(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})/i);
+        if (hdrDateMatch) {
+          headerDateInfo = parseDateInfo(hdrDateMatch[1]);
+        }
+
+        const rawLines = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+        const reconstructed = []; // { type: 'section' | 'row', text: string }
+
+        for (let i = 0; i < rawLines.length; i++) {
+          const line = rawLines[i].trim();
+          if (!line) continue;
+          if (isIgnoredAdminLine(line)) continue;
+
+          // 1) ¿Es encabezado de sección?
+          const secName = detectSectionHeader(line);
+          if (secName) {
+            reconstructed.push({ type: 'section', text: secName });
+            continue;
+          }
+
+          // 2) ¿Es continuación de intervalo de referencia "( ... )"?
+          if (line.startsWith('(')) {
+            if (reconstructed.length > 0 && reconstructed[reconstructed.length - 1].type === 'row') {
+              reconstructed[reconstructed.length - 1].text += ' ' + line;
+            }
+            continue;
+          }
+
+          // 3) ¿Es continuación de un nombre partido en 2 líneas (ej. "Concentración Hemoglobina" + "Corpuscular Media 30,1 ...")?
+          if (reconstructed.length > 0 && reconstructed[reconstructed.length - 1].type === 'row') {
+            const prevText = reconstructed[reconstructed.length - 1].text;
+            const prevComplete = lineLooksComplete(prevText);
+            const prevIsPanel = isAllCapsPanelTitle(prevText);
+            const currStartsCode = hasAbrHeader && startsWithAbrCode(line);
+
+            if (!prevComplete && !prevIsPanel && !currStartsCode) {
+              reconstructed[reconstructed.length - 1].text += ' ' + line;
+              continue;
+            }
+          }
+
+          reconstructed.push({ type: 'row', text: line });
+        }
+
+        let currentSection = 'General';
+        let examIdx = 0;
+        let countA = 0;
+        let countB = 0;
+
+        for (const item of reconstructed) {
+          if (item.type === 'section') {
+            currentSection = item.text;
+            continue;
+          }
+          const parsed = parseSingleRow(item.text, currentSection, examIdx, hasAbrHeader, headerDateInfo);
+          if (parsed) {
+            if (parsed.detectedFormat === 'B') countB++;
+            else countA++;
+            output.exams.push(parsed);
+            examIdx++;
+          }
+        }
+
+        if (countB > 0 && countA > 0) output.formatSummary = 'Mixto (A + B)';
+        else if (countB > 0) output.formatSummary = 'Formato Siclope con fecha';
+        else if (countA > 0) output.formatSummary = 'Formato Openlab (Abr)';
+
+        return output;
+      }
+
+      /* =========================================================================
+         5. FORMATEADOR DE SALIDA CLÍNICA (PRECISIÓN ESTRICTA, Na/K/Cl, GASES, SERIADOS)
+         ========================================================================= */
+
+      /**
+       * Formatea el valor SIN convertir jamás a float ni redondear.
+       */
+      function formatExactValue(rawVal, options) {
+        let str = String(rawVal);
+        // 1) Cambio de separador decimal (solo reemplazo de texto)
+        if (options.useDotDecimal) {
+          str = str.replace(/,/g, '.');
+        } else {
+          str = str.replace(/\./g, ',');
+        }
+        // 2) Toggle opcional: quitar solo ceros decimales a la derecha (.0 / .10 -> .1)
+        if (options.stripTrailingZeros) {
+          str = str.replace(/^([<>]=?\s*)?(-?\d+)([.,])(\d*?)0+$/, function (m, pfx, intP, sep, decP) {
+            const p = pfx || '';
+            return decP.length > 0 ? `${p}${intP}${sep}${decP}` : `${p}${intP}`;
+          });
+        }
+        return str;
+      }
+
+      /**
+       * Obtiene la etiqueta visible de un examen según el modo elegido.
+       */
+      function getExamLabel(ex, labelStyle) {
+        if (labelStyle === 'short') return ex.shortLabel;
+        if (labelStyle === 'full') return ex.nombre;
+        return ex.preferredLabel;
+      }
+
+      /**
+       * Formatea el valor + % (si aplica) + flecha (opcional) + unidad (opcional).
+       */
+      function formatValuePayload(ex, options) {
+        let out = formatExactValue(ex.valor, options);
+        if (ex.appendPercent && !out.endsWith('%')) {
+          out += '%';
+        }
+        if (options.includeFlags && ex.flag) {
+          out += ex.flag;
+        }
+        if (options.includeUnits && ex.unidad) {
+          // Evitar duplicar "%" en Porcentaje de protrombina
+          if (!(ex.appendPercent && ex.unidad.trim() === '%')) {
+            out += ' ' + ex.unidad;
+          }
+        }
+        return out;
+      }
+
+      /**
+       * Ordena exámenes dentro de un grupo respetando orden original de secciones,
+       * aplicando prioridad clínica dentro de cada sección (ej. Coagulación: TP antes de Protrombina%).
+       */
+      function sortExamsClinically(exams) {
+        // Agrupar por sección en orden de primera aparición
+        const secOrder = [];
+        const bySec = new Map();
+        for (const ex of exams) {
+          if (!bySec.has(ex.seccion)) {
+            secOrder.push(ex.seccion);
+            bySec.set(ex.seccion, []);
+          }
+          bySec.get(ex.seccion).push(ex);
+        }
+        const result = [];
+        for (const sec of secOrder) {
+          const list = bySec.get(sec).slice().sort((a, b) => {
+            if (a.sortPriority !== b.sortPriority) return a.sortPriority - b.sortPriority;
+            return a.index - b.index;
+          });
+          result.push(...list);
+        }
+        return result;
+      }
+
+      /**
+       * Formatea una lista de exámenes de una misma fecha y bloque (Normal o Gases),
+       * manejando agrupación Na/K/Cl y controles seriados en múltiples horas.
+       */
+      function formatBucketItems(exams, options) {
+        const ordered = sortExamsClinically(exams);
+
+        // Contar cuántas veces aparece cada examen canónico (para detectar controles seriados)
+        const keyCounts = new Map();
+        const keyItems = new Map();
+        for (const ex of ordered) {
+          const k = ex.canonicalKey;
+          keyCounts.set(k, (keyCounts.get(k) || 0) + 1);
+          if (!keyItems.has(k)) keyItems.set(k, []);
+          keyItems.get(k).push(ex);
+        }
+
+        // Verificar si aplica agrupación compacta Na/K/Cl
+        const elpMap = { Na: null, K: null, Cl: null };
+        let canGroupElp = false;
+        if (options.groupElp) {
+          for (const ex of ordered) {
+            if (ex.elpRole && keyCounts.get(ex.canonicalKey) === 1 && !elpMap[ex.elpRole]) {
+              elpMap[ex.elpRole] = ex;
+            }
+          }
+          const presentElp = ['Na', 'K', 'Cl'].filter(r => elpMap[r] !== null);
+          canGroupElp = presentElp.length >= 2;
+        }
+
+        const consumedKeys = new Set();
+        const tokens = [];
+
+        for (const ex of ordered) {
+          const k = ex.canonicalKey;
+          if (consumedKeys.has(k)) continue;
+
+          // Caso 1: Agrupación compacta Na/K/Cl
+          if (canGroupElp && ex.elpRole && elpMap[ex.elpRole]) {
+            const roles = ['Na', 'K', 'Cl'].filter(r => elpMap[r] !== null);
+            const labels = roles.join('/');
+            const vals = roles.map(r => {
+              const item = elpMap[r];
+              consumedKeys.add(item.canonicalKey);
+              let v = formatExactValue(item.valor, options);
+              if (options.includeFlags && item.flag) v += item.flag;
+              return v;
+            });
+            let elpStr = `${labels} ${vals.join('/')}`;
+            if (options.includeUnits) {
+              const firstUnit = elpMap[roles[0]].unidad;
+              if (firstUnit) elpStr += ` ${firstUnit}`;
+            }
+            tokens.push(elpStr);
+            continue;
+          }
+
+          // Caso 2: Controles seriados del mismo examen en la misma fecha (ej. TTPA a varias horas)
+          if (keyCounts.get(k) > 1) {
+            consumedKeys.add(k);
+            const series = keyItems.get(k).slice().sort((a, b) => {
+              const ta = a.time || '99:99';
+              const tb = b.time || '99:99';
+              if (ta !== tb) return ta.localeCompare(tb);
+              return a.index - b.index;
+            });
+
+            const label = getExamLabel(series[0], options.labelStyle);
+            const parts = series.map((item, idx) => {
+              const valPay = formatValuePayload(item, options);
+              const timeSuffix = item.time ? ` ${item.time}` : '';
+              return idx === 0 ? `${label} ${valPay}${timeSuffix}` : `${valPay}${timeSuffix}`;
+            });
+            tokens.push(parts.join(', '));
+            continue;
+          }
+
+          // Caso 3: Examen único
+          consumedKeys.add(k);
+          const label = getExamLabel(ex, options.labelStyle);
+          const valPay = formatValuePayload(ex, options);
+          tokens.push(`${label} ${valPay}`);
+        }
+
+        return tokens.join(', ');
+      }
+
+      /**
+       * Determina el título de la línea de Gases según el tipo de gas detectado (si está habilitado).
+       */
+      function buildGasesTitle(dateLabel, allDateExams, includeGasTypeTitle) {
+        let gasWord = 'Gases';
+        if (includeGasTypeTitle) {
+          const tipoEx = allDateExams.find(ex => ex.canonicalKey === 'tipo_gas');
+          if (tipoEx && tipoEx.valor) {
+            const v = normalizeText(tipoEx.valor);
+            if (v.includes('venos')) gasWord = 'Gases venosos';
+            else if (v.includes('arter')) gasWord = 'Gases arteriales';
+            else if (v.includes('capil')) gasWord = 'Gases capilares';
+            else gasWord = `Gases (${tipoEx.valor})`;
+          }
+        }
+        return dateLabel ? `${dateLabel} ${gasWord}:` : `${gasWord}:`;
+      }
+
+      /**
+       * Genera el texto completo de salida agrupado cronológicamente por fecha.
+       */
+      function generateOutput(allExams, selectedIds, options, manualDate) {
+        const selected = allExams.filter(ex => selectedIds.has(ex.id));
+        if (selected.length === 0) return '';
+
+        // Agrupar exámenes seleccionados por fecha
+        const datesMap = new Map();
+        const allByDate = new Map();
+
+        for (const ex of allExams) {
+          if (!allByDate.has(ex.dateSort)) allByDate.set(ex.dateSort, []);
+          allByDate.get(ex.dateSort).push(ex);
+        }
+
+        for (const ex of selected) {
+          if (!datesMap.has(ex.dateSort)) {
+            datesMap.set(ex.dateSort, {
+              dateSort: ex.dateSort,
+              dateDisplay: ex.dateDisplay,
+              items: []
+            });
+          }
+          datesMap.get(ex.dateSort).items.push(ex);
+        }
+
+        // Ordenar fechas cronológicamente
+        const sortedDates = Array.from(datesMap.values()).sort((a, b) => {
+          if (a.dateSort === '__NODATE__') return 1;
+          if (b.dateSort === '__NODATE__') return -1;
+          return a.dateSort.localeCompare(b.dateSort);
+        });
+
+        const blocks = [];
+
+        for (const group of sortedDates) {
+          const dateLabel = group.dateDisplay || (manualDate ? manualDate.trim() : '');
+          const fullDayExams = allByDate.get(group.dateSort) || [];
+
+          if (options.separateGases) {
+            const normalItems = group.items.filter(ex => !ex.isGasSection);
+            const gasItems = group.items.filter(ex => ex.isGasSection);
+
+            if (normalItems.length > 0) {
+              const formatted = formatBucketItems(normalItems, options);
+              blocks.push(dateLabel ? `${dateLabel}: ${formatted}` : formatted);
+            }
+            if (gasItems.length > 0) {
+              const formattedGas = formatBucketItems(gasItems, options);
+              const gasPrefix = buildGasesTitle(dateLabel, fullDayExams, options.includeGasTypeTitle);
+              blocks.push(`${gasPrefix} ${formattedGas}`);
+            }
+          } else {
+            const formatted = formatBucketItems(group.items, options);
+            blocks.push(dateLabel ? `${dateLabel}: ${formatted}` : formatted);
+          }
+        }
+
+        return blocks.join('\n\n');
+      }
+
+      /* =========================================================================
+         6. ESTADO DE LA APLICACIÓN Y REFERENCIAS AL DOM
+         ========================================================================= */
+      const state = {
+        exams: [],
+        selectedIds: new Set(),
+        activePreset: 'essential', // 'essential' | 'all' | 'altered' | 'none' | 'custom'
+        searchQuery: '',
+        manualDate: '',
+        isManualEdit: false,
+        options: {
+          groupElp: true,
+          separateGases: true,
+          useDotDecimal: true,
+          stripTrailingZeros: false,
+          includeFlags: false,
+          includeUnits: false,
+          includeGasTypeTitle: false,
+          labelStyle: 'preferred'
+        }
+      };
+
+      const dom = {
+        rawInput: document.getElementById('rawInput'),
+        btnExampleMain: document.getElementById('btnExampleMain'),
+        btnExampleMulti: document.getElementById('btnExampleMulti'),
+        btnClear: document.getElementById('btnClear'),
+        parseStatus: document.getElementById('parseStatus'),
+        formatBadge: document.getElementById('formatBadge'),
+        manualDateInput: document.getElementById('manualDateInput'),
+        outputText: document.getElementById('outputText'),
+        selectedBadge: document.getElementById('selectedBadge'),
+        btnCopy: document.getElementById('btnCopy'),
+        btnCopyText: document.getElementById('btnCopyText'),
+        iconCopy: document.getElementById('iconCopy'),
+        iconCheck: document.getElementById('iconCheck'),
+        btnResetManual: document.getElementById('btnResetManual'),
+        manualEditTag: document.getElementById('manualEditTag'),
+        optGroupElp: document.getElementById('optGroupElp'),
+        optSeparateGases: document.getElementById('optSeparateGases'),
+        optDotDecimal: document.getElementById('optDotDecimal'),
+        optStripZeros: document.getElementById('optStripZeros'),
+        optFlags: document.getElementById('optFlags'),
+        optUnits: document.getElementById('optUnits'),
+        optGasTypeTitle: document.getElementById('optGasTypeTitle'),
+        labelStyleSelect: document.getElementById('labelStyleSelect'),
+        btnPresetEssential: document.getElementById('btnPresetEssential'),
+        btnPresetAll: document.getElementById('btnPresetAll'),
+        btnPresetAltered: document.getElementById('btnPresetAltered'),
+        btnPresetNone: document.getElementById('btnPresetNone'),
+        searchInput: document.getElementById('searchInput'),
+        btnClearSearch: document.getElementById('btnClearSearch'),
+        examsContainer: document.getElementById('examsContainer'),
+        toastContainer: document.getElementById('toastContainer')
+      };
+
+      /* =========================================================================
+         7. FUNCIONES DE INTERFAZ Y RENDERIZADO
+         ========================================================================= */
+
+      function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = 'toast' + (type ? ' ' + type : '');
+        toast.textContent = message;
+        dom.toastContainer.appendChild(toast);
+
+        requestAnimationFrame(() => toast.classList.add('show'));
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 220);
+        }, 2300);
+      }
+
+      function syncToggleChips() {
+        const chips = document.querySelectorAll('.toggle-chip');
+        chips.forEach(chip => {
+          const input = chip.querySelector('input');
+          if (input) chip.classList.toggle('active', input.checked);
+        });
+      }
+
+      function syncPresetButtons() {
+        const map = {
+          essential: dom.btnPresetEssential,
+          all: dom.btnPresetAll,
+          altered: dom.btnPresetAltered,
+          none: dom.btnPresetNone
+        };
+        Object.values(map).forEach(btn => btn.classList.remove('preset-active'));
+        if (map[state.activePreset]) {
+          map[state.activePreset].classList.add('preset-active');
+        }
+      }
+
+      function applyPreset(presetName, silent) {
+        state.activePreset = presetName;
+        state.selectedIds.clear();
+
+        if (presetName === 'essential') {
+          const essentials = state.exams.filter(ex => ex.essential);
+          if (essentials.length > 0) {
+            essentials.forEach(ex => state.selectedIds.add(ex.id));
+          } else {
+            state.exams.forEach(ex => state.selectedIds.add(ex.id));
+          }
+        } else if (presetName === 'all') {
+          state.exams.forEach(ex => state.selectedIds.add(ex.id));
+        } else if (presetName === 'altered') {
+          state.exams.forEach(ex => {
+            if (ex.flag === '↑' || ex.flag === '↓') state.selectedIds.add(ex.id);
+          });
+        }
+
+        syncPresetButtons();
         renderExamsList();
         updateOutputUI(true);
-      } catch (err) {
-        console.error('Error al procesar los exámenes:', err);
-        showToast('Ocurrió un error al analizar el texto pegado.', 'warning');
-      }
-    }
 
-    /**
-     * Copia el resultado al portapapeles usando document.execCommand('copy')
-     * para asegurar compatibilidad total incluso dentro de iframes.
-     */
-    function copyResultToClipboard() {
-      const text = dom.outputText.value;
-      if (!text.trim()) {
-        showToast('No hay texto para copiar. Selecciona al menos un examen.', 'warning');
-        return;
-      }
-
-      try {
-        dom.outputText.focus();
-        dom.outputText.select();
-        dom.outputText.setSelectionRange(0, text.length);
-
-        const success = document.execCommand('copy');
-        if (success) {
-          triggerCopyFeedback();
-          showToast('¡Copiado al portapapeles!', 'success');
-        } else {
-          showToast('No se pudo copiar automáticamente. Usa Ctrl+C.', 'warning');
+        if (!silent && state.exams.length > 0) {
+          showToast(`${state.selectedIds.size} exámenes seleccionados.`);
         }
-      } catch (err) {
-        console.error('Error al copiar:', err);
-        showToast('Error al copiar. Selecciona el texto y usa Ctrl+C.', 'warning');
       }
-    }
 
-    /**
-     * Animación visual temporal en el botón de copiar.
-     */
-    let copyFeedbackTimer = null;
-    function triggerCopyFeedback() {
-      dom.btnCopy.classList.remove('bg-medical-600', 'hover:bg-medical-700');
-      dom.btnCopy.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
-      dom.iconCopy.classList.add('hidden');
-      dom.iconCheck.classList.remove('hidden');
-      dom.btnCopyText.textContent = '¡Copiado!';
+      function updateOutputUI(forceAuto) {
+        const count = state.selectedIds.size;
+        dom.selectedBadge.textContent = count === 1 ? '1 seleccionado' : `${count} seleccionados`;
 
-      clearTimeout(copyFeedbackTimer);
-      copyFeedbackTimer = setTimeout(() => {
-        dom.btnCopy.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
-        dom.btnCopy.classList.add('bg-medical-600', 'hover:bg-medical-700');
-        dom.iconCopy.classList.remove('hidden');
-        dom.iconCheck.classList.add('hidden');
-        dom.btnCopyText.textContent = 'Copiar resultado';
-      }, 1800);
-    }
+        if (forceAuto) {
+          state.isManualEdit = false;
+        }
 
-    // =========================================================================
-    // EVENT LISTENERS
-    // =========================================================================
+        if (!state.isManualEdit) {
+          dom.outputText.value = generateOutput(state.exams, state.selectedIds, state.options, state.manualDate);
+          dom.btnResetManual.classList.add('hidden');
+          dom.manualEditTag.classList.add('hidden');
+        }
 
-    // Entrada en tiempo real al pegar o escribir
-    dom.rawInput.addEventListener('input', () => processInput(true));
+        dom.btnCopy.disabled = !dom.outputText.value.trim();
+      }
 
-    // Cargar ejemplo
-    dom.btnLoadExample.addEventListener('click', () => {
-      dom.rawInput.value = SAMPLE_SICLOPE_TEXT;
-      processInput(true);
-      showToast('Ejemplo de Siclope cargado con esenciales seleccionados.', 'info');
-    });
+      function renderExamsList() {
+        const container = dom.examsContainer;
+        container.innerHTML = '';
 
-    // Limpiar entrada
-    dom.btnClear.addEventListener('click', () => {
-      dom.rawInput.value = '';
-      dom.searchInput.value = '';
-      state.searchQuery = '';
-      dom.btnClearSearch.classList.add('hidden');
-      processInput(true);
-      dom.rawInput.focus();
-    });
+        if (state.exams.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                  <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                </svg>
+              </div>
+              <p class="empty-title">Aún no hay exámenes pegados</p>
+              <p>Pega los resultados de Siclope en el panel izquierdo o prueba con <strong>"Cargar ejemplo"</strong>.</p>
+            </div>
+          `;
+          return;
+        }
 
-    // Botones de modo de etiqueta (Corta / Abr / Completo)
-    dom.labelModeBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        state.options.labelMode = btn.dataset.labelMode;
-        dom.labelModeBtns.forEach(b => {
-          b.classList.remove('bg-white', 'text-medical-700', 'shadow-sm');
-          b.classList.add('text-slate-600', 'hover:text-slate-900');
+        const q = normalizeText(state.searchQuery);
+        const filtered = q
+          ? state.exams.filter(ex =>
+              normalizeText(ex.nombre).includes(q) ||
+              normalizeText(ex.preferredLabel).includes(q) ||
+              normalizeText(ex.shortLabel).includes(q) ||
+              normalizeText(ex.abr).includes(q) ||
+              normalizeText(ex.seccion).includes(q) ||
+              normalizeText(ex.dateDisplay).includes(q)
+            )
+          : state.exams;
+
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <p class="empty-title">Sin coincidencias para "${escapeHtml(state.searchQuery)}"</p>
+              <p>Intenta buscar con otro término o borra el filtro.</p>
+            </div>
+          `;
+          return;
+        }
+
+        // Agrupar por Fecha -> Sección
+        const dateGroupsMap = new Map();
+        for (const ex of filtered) {
+          if (!dateGroupsMap.has(ex.dateSort)) {
+            dateGroupsMap.set(ex.dateSort, {
+              dateSort: ex.dateSort,
+              dateDisplay: ex.dateDisplay,
+              sections: new Map()
+            });
+          }
+          const dg = dateGroupsMap.get(ex.dateSort);
+          if (!dg.sections.has(ex.seccion)) {
+            dg.sections.set(ex.seccion, []);
+          }
+          dg.sections.get(ex.seccion).push(ex);
+        }
+
+        const sortedDateGroups = Array.from(dateGroupsMap.values()).sort((a, b) => {
+          if (a.dateSort === '__NODATE__') return 1;
+          if (b.dateSort === '__NODATE__') return -1;
+          return a.dateSort.localeCompare(b.dateSort);
         });
-        btn.classList.add('bg-white', 'text-medical-700', 'shadow-sm');
-        btn.classList.remove('text-slate-600', 'hover:text-slate-900');
+
+        const showDateHeaders = sortedDateGroups.length > 1 || (sortedDateGroups.length === 1 && sortedDateGroups[0].dateDisplay);
+
+        for (const dg of sortedDateGroups) {
+          const dateWrapper = document.createElement('div');
+          dateWrapper.className = 'date-group';
+
+          if (showDateHeaders) {
+            const dHeader = document.createElement('div');
+            dHeader.className = 'date-group-header';
+            const totalInDate = Array.from(dg.sections.values()).reduce((acc, arr) => acc + arr.length, 0);
+            const selInDate = Array.from(dg.sections.values()).reduce(
+              (acc, arr) => acc + arr.filter(ex => state.selectedIds.has(ex.id)).length, 0
+            );
+            const titleText = dg.dateDisplay
+              ? `Fecha: ${dg.dateDisplay}`
+              : (state.manualDate.trim() ? `Fecha manual: ${state.manualDate.trim()}` : 'Sin fecha en fila');
+            dHeader.innerHTML = `<span>${escapeHtml(titleText)}</span><span>${selInDate} / ${totalInDate}</span>`;
+            dateWrapper.appendChild(dHeader);
+          }
+
+          for (const [secName, items] of dg.sections.entries()) {
+            const selCount = items.filter(ex => state.selectedIds.has(ex.id)).length;
+            const allChecked = selCount === items.length && items.length > 0;
+            const someChecked = selCount > 0 && selCount < items.length;
+
+            // Cabecera de sección con checkbox maestro
+            const secHeader = document.createElement('div');
+            secHeader.className = 'section-header';
+
+            const secLabel = document.createElement('label');
+            secLabel.className = 'section-check-label';
+
+            const masterCb = document.createElement('input');
+            masterCb.type = 'checkbox';
+            masterCb.checked = allChecked;
+            masterCb.indeterminate = someChecked;
+            masterCb.addEventListener('change', () => {
+              state.activePreset = 'custom';
+              syncPresetButtons();
+              const check = masterCb.checked;
+              for (const ex of items) {
+                if (check) state.selectedIds.add(ex.id);
+                else state.selectedIds.delete(ex.id);
+              }
+              renderExamsList();
+              updateOutputUI(true);
+            });
+
+            const secSpan = document.createElement('span');
+            secSpan.textContent = secName;
+
+            secLabel.appendChild(masterCb);
+            secLabel.appendChild(secSpan);
+
+            const secPill = document.createElement('span');
+            secPill.className = 'count-pill';
+            secPill.textContent = `${selCount} / ${items.length}`;
+
+            secHeader.appendChild(secLabel);
+            secHeader.appendChild(secPill);
+            dateWrapper.appendChild(secHeader);
+
+            // Filas de exámenes
+            for (const ex of items) {
+              const isSelected = state.selectedIds.has(ex.id);
+              const row = document.createElement('label');
+              row.className = 'exam-row' + (isSelected ? ' selected' : '');
+
+              const left = document.createElement('div');
+              left.className = 'exam-left';
+
+              const cb = document.createElement('input');
+              cb.type = 'checkbox';
+              cb.checked = isSelected;
+              cb.addEventListener('change', () => {
+                state.activePreset = 'custom';
+                syncPresetButtons();
+                if (cb.checked) state.selectedIds.add(ex.id);
+                else state.selectedIds.delete(ex.id);
+                renderExamsList();
+                updateOutputUI(true);
+              });
+
+              const namesWrap = document.createElement('div');
+              namesWrap.className = 'exam-names';
+
+              const topLine = document.createElement('div');
+              topLine.className = 'exam-label-line';
+
+              const shortEl = document.createElement('span');
+              shortEl.className = 'exam-short';
+              shortEl.textContent = getExamLabel(ex, state.options.labelStyle);
+              topLine.appendChild(shortEl);
+
+              if (ex.time) {
+                const timePill = document.createElement('span');
+                timePill.className = 'exam-time-pill';
+                timePill.textContent = ex.time;
+                topLine.appendChild(timePill);
+              }
+
+              if (ex.abr && ex.abr.toLowerCase() !== shortEl.textContent.toLowerCase()) {
+                const abrPill = document.createElement('span');
+                abrPill.className = 'exam-abr-pill';
+                abrPill.textContent = ex.abr;
+                topLine.appendChild(abrPill);
+              }
+
+              namesWrap.appendChild(topLine);
+
+              if (normalizeText(ex.nombre) !== normalizeText(shortEl.textContent)) {
+                const fullEl = document.createElement('div');
+                fullEl.className = 'exam-full';
+                fullEl.title = ex.nombre;
+                fullEl.textContent = ex.nombre;
+                namesWrap.appendChild(fullEl);
+              }
+
+              left.appendChild(cb);
+              left.appendChild(namesWrap);
+
+              const right = document.createElement('div');
+              right.className = 'exam-right';
+
+              const valLine = document.createElement('div');
+              valLine.className = 'exam-val-line';
+
+              const valBadge = document.createElement('span');
+              let badgeCls = 'val-badge';
+              if (ex.flag === '↑') badgeCls += ' high';
+              else if (ex.flag === '↓') badgeCls += ' low';
+              valBadge.className = badgeCls;
+
+              let displayVal = formatExactValue(ex.valor, state.options);
+              if (ex.appendPercent && !displayVal.endsWith('%')) displayVal += '%';
+              valBadge.textContent = ex.flag ? `${displayVal} ${ex.flag}` : displayVal;
+              valLine.appendChild(valBadge);
+
+              if (ex.unidad && !(ex.appendPercent && ex.unidad === '%')) {
+                const unitEl = document.createElement('span');
+                unitEl.className = 'exam-unit';
+                unitEl.textContent = ex.unidad;
+                valLine.appendChild(unitEl);
+              }
+
+              right.appendChild(valLine);
+
+              if (ex.ref) {
+                const refEl = document.createElement('div');
+                refEl.className = 'exam-ref';
+                refEl.textContent = `Ref: ${ex.ref}`;
+                right.appendChild(refEl);
+              }
+
+              row.appendChild(left);
+              row.appendChild(right);
+              dateWrapper.appendChild(row);
+            }
+          }
+
+          container.appendChild(dateWrapper);
+        }
+      }
+
+      /**
+       * Procesa el texto pegado, actualiza estadísticas y aplica preset esencial.
+       */
+      function handleRawInput() {
+        try {
+          const text = dom.rawInput.value;
+          const parsed = parseSiclope(text);
+          state.exams = parsed.exams;
+
+          if (state.exams.length > 0) {
+            const datesCount = new Set(state.exams.map(e => e.dateSort)).size;
+            const alteredCount = state.exams.filter(e => e.flag).length;
+            dom.parseStatus.innerHTML = `
+              <span class="status-dot ok"></span>
+              <strong>${state.exams.length} exámenes</strong>
+              · ${datesCount} ${datesCount === 1 ? 'fecha' : 'fechas'}
+              ${alteredCount > 0 ? `· <span style="color:var(--danger);font-weight:600;">${alteredCount} alterados</span>` : ''}
+            `;
+            dom.formatBadge.textContent = parsed.formatSummary;
+            dom.formatBadge.classList.remove('hidden');
+
+            applyPreset('essential', true);
+          } else {
+            state.selectedIds.clear();
+            dom.formatBadge.classList.add('hidden');
+            if (text.trim()) {
+              dom.parseStatus.innerHTML = `<span class="status-dot warn"></span><span>No se reconocieron exámenes válidos en el texto pegado.</span>`;
+            } else {
+              dom.parseStatus.innerHTML = `<span class="status-dot"></span><span>Esperando exámenes...</span>`;
+            }
+            renderExamsList();
+            updateOutputUI(true);
+          }
+        } catch (err) {
+          console.error('Error al parsear exámenes:', err);
+          showToast('Error al analizar el texto pegado.', 'warn');
+        }
+      }
+
+      /**
+       * Copia el texto del resultado al portapapeles usando execCommand('copy')
+       * para compatibilidad garantizada en iframes y archivos locales.
+       */
+      let copyTimer = null;
+      function copyResult() {
+        const text = dom.outputText.value;
+        if (!text.trim()) {
+          showToast('No hay texto para copiar.', 'warn');
+          return;
+        }
+        try {
+          dom.outputText.focus();
+          dom.outputText.select();
+          dom.outputText.setSelectionRange(0, text.length);
+          const ok = document.execCommand('copy');
+          if (ok) {
+            dom.btnCopy.classList.add('copied');
+            dom.iconCopy.classList.add('hidden');
+            dom.iconCheck.classList.remove('hidden');
+            dom.btnCopyText.textContent = '¡Copiado!';
+            showToast('¡Resultado copiado al portapapeles!', 'success');
+
+            clearTimeout(copyTimer);
+            copyTimer = setTimeout(() => {
+              dom.btnCopy.classList.remove('copied');
+              dom.iconCopy.classList.remove('hidden');
+              dom.iconCheck.classList.add('hidden');
+              dom.btnCopyText.textContent = 'Copiar resultado';
+            }, 1800);
+          } else {
+            showToast('No se pudo copiar automáticamente. Usa Ctrl+C.', 'warn');
+          }
+        } catch (e) {
+          showToast('Error al copiar. Selecciona y usa Ctrl+C.', 'warn');
+        }
+      }
+
+      /* =========================================================================
+         8. EVENTOS DE INTERACCIÓN
+         ========================================================================= */
+
+      dom.rawInput.addEventListener('input', handleRawInput);
+
+      dom.btnExampleMain.addEventListener('click', () => {
+        dom.rawInput.value = SAMPLE_MAIN;
+        handleRawInput();
+        showToast('Ejemplo cargado con exámenes esenciales seleccionados.');
+      });
+
+      dom.btnExampleMulti.addEventListener('click', () => {
+        dom.rawInput.value = SAMPLE_MULTI_DAY;
+        handleRawInput();
+        showToast('Ejemplo multi-día con controles seriados de TTPA cargado.');
+      });
+
+      dom.btnClear.addEventListener('click', () => {
+        dom.rawInput.value = '';
+        dom.searchInput.value = '';
+        state.searchQuery = '';
+        dom.btnClearSearch.style.display = 'none';
+        handleRawInput();
+        dom.rawInput.focus();
+      });
+
+      dom.manualDateInput.addEventListener('input', (e) => {
+        state.manualDate = e.target.value;
+        renderExamsList();
         updateOutputUI(true);
       });
-    });
 
-    // Selectores de formato
-    dom.separatorSelect.addEventListener('change', (e) => {
-      state.options.separator = e.target.value;
-      updateOutputUI(true);
-    });
+      // Toggles de formato
+      const bindToggle = (el, key, reRenderList) => {
+        el.addEventListener('change', () => {
+          state.options[key] = el.checked;
+          syncToggleChips();
+          if (reRenderList) renderExamsList();
+          updateOutputUI(true);
+        });
+      };
 
-    dom.decimalSelect.addEventListener('change', (e) => {
-      state.options.decimalMode = e.target.value;
-      renderExamsList();
-      updateOutputUI(true);
-    });
+      bindToggle(dom.optGroupElp, 'groupElp', false);
+      bindToggle(dom.optSeparateGases, 'separateGases', false);
+      bindToggle(dom.optDotDecimal, 'useDotDecimal', true);
+      bindToggle(dom.optStripZeros, 'stripTrailingZeros', true);
+      bindToggle(dom.optFlags, 'includeFlags', false);
+      bindToggle(dom.optUnits, 'includeUnits', false);
+      bindToggle(dom.optGasTypeTitle, 'includeGasTypeTitle', false);
 
-    dom.optGroupBySection.addEventListener('change', (e) => {
-      state.options.groupBySection = e.target.checked;
-      updateOutputUI(true);
-    });
-
-    dom.optIncludeFlags.addEventListener('change', (e) => {
-      state.options.includeFlags = e.target.checked;
-      updateOutputUI(true);
-    });
-
-    dom.optIncludeUnits.addEventListener('change', (e) => {
-      state.options.includeUnits = e.target.checked;
-      updateOutputUI(true);
-    });
-
-    dom.optIncludeDate.addEventListener('change', (e) => {
-      state.options.includeDate = e.target.checked;
-      updateOutputUI(true);
-    });
-
-    // Edición manual del resultado
-    dom.outputText.addEventListener('input', () => {
-      state.isManualEdit = true;
-      dom.btnResetOutput.classList.remove('hidden');
-      dom.manualEditNotice.classList.remove('hidden');
-      dom.btnCopy.disabled = !dom.outputText.value.trim();
-    });
-
-    dom.btnResetOutput.addEventListener('click', () => {
-      updateOutputUI(true);
-      showToast('Texto restaurado al formato automático.', 'info');
-    });
-
-    // Copiar resultado
-    dom.btnCopy.addEventListener('click', copyResultToClipboard);
-
-    // Botones de selección rápida
-    dom.btnSelectEssential.addEventListener('click', () => {
-      if (state.exams.length === 0) return;
-      state.selectedIds.clear();
-      state.exams.forEach(ex => {
-        if (ESSENTIAL_CODES.has(ex.upperAbr)) {
-          state.selectedIds.add(ex.id);
-        }
+      dom.labelStyleSelect.addEventListener('change', (e) => {
+        state.options.labelStyle = e.target.value;
+        renderExamsList();
+        updateOutputUI(true);
       });
-      renderExamsList();
-      updateOutputUI(true);
-      showToast(`${state.selectedIds.size} exámenes esenciales seleccionados.`, 'info');
-    });
 
-    dom.btnSelectAltered.addEventListener('click', () => {
-      if (state.exams.length === 0) return;
-      state.selectedIds.clear();
-      state.exams.forEach(ex => {
-        if (ex.flag === '↑' || ex.flag === '↓') {
-          state.selectedIds.add(ex.id);
-        }
+      // Edición manual del cuadro de salida
+      dom.outputText.addEventListener('input', () => {
+        state.isManualEdit = true;
+        dom.btnResetManual.classList.remove('hidden');
+        dom.manualEditTag.classList.remove('hidden');
+        dom.btnCopy.disabled = !dom.outputText.value.trim();
       });
-      renderExamsList();
+
+      dom.btnResetManual.addEventListener('click', () => {
+        updateOutputUI(true);
+        showToast('Resultado restaurado al formato automático.');
+      });
+
+      dom.btnCopy.addEventListener('click', copyResult);
+
+      // Presets de selección
+      dom.btnPresetEssential.addEventListener('click', () => applyPreset('essential', false));
+      dom.btnPresetAll.addEventListener('click', () => applyPreset('all', false));
+      dom.btnPresetAltered.addEventListener('click', () => applyPreset('altered', false));
+      dom.btnPresetNone.addEventListener('click', () => applyPreset('none', false));
+
+      // Buscador instantáneo
+      dom.searchInput.addEventListener('input', (e) => {
+        state.searchQuery = e.target.value;
+        dom.btnClearSearch.style.display = state.searchQuery ? 'block' : 'none';
+        renderExamsList();
+      });
+
+      dom.btnClearSearch.addEventListener('click', () => {
+        dom.searchInput.value = '';
+        state.searchQuery = '';
+        dom.btnClearSearch.style.display = 'none';
+        renderExamsList();
+        dom.searchInput.focus();
+      });
+
+      // Inicialización
+      syncToggleChips();
+      syncPresetButtons();
       updateOutputUI(true);
-      showToast(`${state.selectedIds.size} exámenes alterados seleccionados.`, 'info');
-    });
-
-    dom.btnSelectAll.addEventListener('click', () => {
-      if (state.exams.length === 0) return;
-      state.exams.forEach(ex => state.selectedIds.add(ex.id));
-      renderExamsList();
-      updateOutputUI(true);
-    });
-
-    dom.btnSelectNone.addEventListener('click', () => {
-      state.selectedIds.clear();
-      renderExamsList();
-      updateOutputUI(true);
-    });
-
-    // Búsqueda rápida en vivo
-    dom.searchInput.addEventListener('input', (e) => {
-      state.searchQuery = e.target.value;
-      if (state.searchQuery) {
-        dom.btnClearSearch.classList.remove('hidden');
-      } else {
-        dom.btnClearSearch.classList.add('hidden');
-      }
-      renderExamsList();
-    });
-
-    dom.btnClearSearch.addEventListener('click', () => {
-      dom.searchInput.value = '';
-      state.searchQuery = '';
-      dom.btnClearSearch.classList.add('hidden');
-      renderExamsList();
-      dom.searchInput.focus();
-    });
-
-    // Inicializar estado de botones
-    updateOutputUI(true);
+    })();
   </script>
 </body>
 </html>
